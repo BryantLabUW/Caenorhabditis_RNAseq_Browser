@@ -1,0 +1,2 @@
+group	FLF	FLM	iL3	iL3a	PF	pfL1	ppL1	ppL3	flL1L2	pL1L2
+developmental_stage	Free-living adult female	Free-living adult male	Infective 3rd stage larvae	Activated iL3	Parasitic adult female	Post-free-living L1	Post-parasitic L1	Post-parasitic L3	Free-living L1 and L2s	Parasitic L1 and L2s
