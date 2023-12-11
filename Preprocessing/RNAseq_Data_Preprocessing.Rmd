@@ -17,12 +17,15 @@ The goal of this file is to arrange gene-centric *C. elegans* RNA-seq data from 
 
 
 # Pre-processing Methods Overview  
-Data set is imported into R and annotated with information from WormBase ParaSite BiomaRT. Annotation information includes: UniProtKB number, Interpro terms, GO terms, and general Description information. Annotation information is be saved as an R object that is passed to a Shiny Web App for downstream browsing and on-demand analysis. Note: raw count data could be saved as a digital gene expression list if desired (not currently done).  
+Each genome and gff file were downloaded from WormBase.org version WS290. Reads were aligned to each genome using STAR (v2.7.6a, --alignIntronMax 30000 --alignMatesGapMax 30000) and the species-specific WS290 GTF file for each genome. PCR duplicates were removed using "seldup" ([Warner et al., 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  Read counts were obtained for each gene (CDS region only which is labeled as "CDS"  in *C. briggsae* and *C. elegans* and as "coding_exon" for *C. remanei*, *C. japonica*, and *C. brenneri* ) using featureCounts (from the software package subread-2.0.6) using default settings. Only uniquely mapping reads were counted.  Additionally read counts were obtained for the CDS regions and for the full transcripts using the featureCount options -M --fraction so that multimappers were counted by splitting them equally among all of the locations where they aligned. 
 
+Read data for each species was imported into R and annotated with information from WormBase ParaSite BiomaRT. Annotation information includes: UniProtKB number, Interpro terms, GO terms, and general Description information.
 
-Raw reads were quantified as counts per million using the EdgeR package, then filtered to remove transcripts with low counts (less than 1 count-per-million in at least 3 samples). A list of discarded genes and their expression values across life stages is saved. Non-discarded gene values are normalized using the trimmed mean of M-values method (TMM, [Robinson and Oshlack](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25) ) to permit between-samples comparisons. The mean-variance relationship was modeled using a precision weights approach [Law *et al* 2014](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29).  
+Raw reads were quantified as counts per million using the EdgeR package, then filtered to remove transcripts with low counts (less than 1 count-per-million). A list of discarded genes and their expression values across life stages was saved. Non-discarded gene values were normalized using the trimmed mean of M-values method (TMM, [Robinson and Oshlack](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25) ) to permit between-samples comparisons. The mean-variance relationship was modeled using a precision weights approach [Law *et al* 2014](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29).  
 
 A variance-stabilized DGEList object is saved; this file is passed to a Shiny Web App for downstream browsing and on-demand analysis.  
+
+Count information is saved as a digital gene expression list and annotation information is saved as an R object; these files are passed to the Shiny Web App for downstream browsing and on-demand analysis.  
 
 # Load dependencies
 ```{r dependencies, eval=TRUE, echo = FALSE}
