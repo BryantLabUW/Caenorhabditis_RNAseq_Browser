@@ -1,6 +1,6 @@
 # Caenorhabditis_RNAseq_Browser 
 Web-based Shiny App for browsing and on-demand analysis of *Caenorhabditis* RNA-seq data from the modENCODE project ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/)).  
-[This app is deployed via Shinyapps.io](INSERT LINK)
+[This app is deployed via Shinyapps.io](https://bryantlabuw.shinyapps.io/Caenorhabditis_RNAseq_Browser/)
 
 This app is based on the *Strongyloides* RNA-seq Browser. For more information, [please see the G3 paper associated with the original project](https://pubmed.ncbi.nlm.nih.gov/33823530/).
 
@@ -8,10 +8,9 @@ This app is based on the *Strongyloides* RNA-seq Browser. For more information, 
 1. [General Information](#general-information)
 2. [App Setup & Deployment](#app-setup-&-deployment)
 3. [App Features](#app-features)
-4. [Examples of App Use](#examples-of-shiny-app-ui)
-5. [Sources](#sources)
-6. [License](#license)
-7. [Authors](#authors)
+4. [Sources](#sources)
+5. [License](#license)
+6. [Authors](#authors)
 
 ## General Information
 This repository contains source code for the web-based *Caenorhabditis* RNA-seq Browser. This app is deployed via Shinyapps.io but can also be run locally. See App Setup and App Features sections below for additional details.  
@@ -69,19 +68,14 @@ Features of the app include:
   - Study design files (.csv)
   - Log2 counts per million expression for all genes and all samples (.csv)
   - Variance-stabilized DGEList object (R object; primary data input for the app)
-  - Raw expression data for genes discarded during low-count filterering (.csv)
 
-## Examples of Shiny App UI
-![An example of the User Interface for the RNA-seq Browser Shiny App in Browser by Gene Mode](./UI/Str_RNAseq_Browser_Gene_Mode_Example.png)
-
-![An example of the User Interface for the RNA-seq Browser Shiny App in Browser by Life Stage Mode](./UI/Str_RNAseq_Browser_LifeStage_Mode_Example.png)
 
 ## Sources
 * [Shiny](https://shiny.rstudio.com/) - UI framework
 * [limma](https://bioconductor.org/packages/release/bioc/html/limma.html) - Differential gene expression
 * *Caenorhabditis* RNA-seq datasets:
   - [Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/)
-* [WormBase ParaSite](https://parasite.wormbase.org/index.html) - Gene annotations and reference transcriptomes
+* [WormBase ParaSite](https://parasite.wormbase.org/index.html) - Gene annotations
 * [DIYTranscriptomics](http://diytranscriptomics.com/) - Virtual asynchronous course where the authors learned best practices for RNA-seq data analysis; provided primary pipeline for data pre-processing and analysis
 
 ## License  
@@ -90,5 +84,3 @@ This project is licensed under the MIT License.
 ## Authors  
 * [Astra Bryant, PhD](https://github.com/astrasb)
 
-## Update Notes
-None.
