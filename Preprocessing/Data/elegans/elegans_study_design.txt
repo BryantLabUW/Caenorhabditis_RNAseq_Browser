@@ -1,0 +1,17 @@
+sample	group	block	stage	Strain or Stock	Cell Line	Biological_ID	Description	Organ/Tissue	Age	Sex	Biological Replicate	RNA Fraction	Read Type	Stranded/Unstranded	Library Type	Library ID#	# of Mate Pairs	# of Single Reads	Ribosomal Depletion	Spike In Pool	Published/PMINS
+SRS004859	Dauer	LifeStages	Dauer	C. elegans N2	N/A	DauerDAF2	dauer daf-2(el370) polyA+	Whole organism	dauer	hermaphrodite	1	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"31,472,949"	No	N/A	Y; 21177976
+SRS269390	Dauer	LifeStages	Dauer	C. elegans N2	N/A	DauerDAF2-2	dauer daf-2(el370) polyA+ biological replicate 2	Whole organism	dauer	hermaphrodite	2	PolyA(+)	1X76	Unstranded	N.D.	N/A	0	"5,153,389"	No	N/A	Y;  21177976
+SRS269389	Dauer	LifeStages	Dauer	C. elegans N2	N/A	DauerDAF2-2-1	dauer daf-2(el370) polyA+ biological replicate 2-1	Whole organism	dauer	hermaphrodite	1-Feb	PolyA(+)	2X100	Unstranded	N.D.	N/A	"29,698,377"	0	No	N/A	Y;  21177976
+SRS269391	Dauer	LifeStages	Dauer	C. elegans N2	N/A	DauerDAF2-5-1	dauer daf-2(el370) polyA+ biological replicate 5-1	Whole organism	dauer	hermaphrodite	1-May	PolyA(+)	2X100	Unstranded	N.D.	N/A	"37,499,023"	0	No	N/A	Y;  21177976
+SRS003005	L1	LifeStages	L1	C. elegans N2	N/A	L1	N2 L1 larva polyA+	Whole organism	L1	hermaphrodite	0	PolyA(+)	2X36	Unstranded	N.D.	N/A	"42,336,602"	0	No	N/A	Y; 21177976
+SRS151153	L1	LifeStages	L1	C. elegans N2	N/A	N2_L1-1	N2 L1 larva polyA+ biological replicate	Whole organism	L1	hermaphrodite	1	PolyA(+)	1X76	Unstranded	N.D.	N/A	0	"73,805,921"	No	N/A	Y;  21177976
+SRS001788	L2	LifeStages	L2	C. elegans N2	N/A	L2	N2 L2 larva polyA+	Whole organism	L2	hermaphrodite	1	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"24,345,942"	No	N/A	Y;19181841
+SRS174229	L2	LifeStages	L2	C. elegans N2	N/A	N2_L2-4	N2 L2 larva polyA+ biological replicate	Whole organism	L2	hermaphrodite	4	PolyA(+)	1X76	Unstranded	N.D.	N/A	0	"20,582,635"	No	N/A	Y;  21177976
+SRS001790	L3	LifeStages	L3	C. elegans N2	N/A	L3	N2 L3 larva polyA+	Whole organism	L3	hermaphrodite	0	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"20,714,369"	No	N/A	Y;19181841
+SRS150938	L3	LifeStages	L3	C. elegans N2	N/A	N2_L3-1	N2 L3 larva polyA+ biological replicate	Whole organism	L3	hermaphrodite	1	PolyA(+)	1X76	Unstranded	N.D.	N/A	0	"56,220,307"	No	N/A	Y;  21177976
+SRS001791	L4	LifeStages	L4	C. elegans N2	N/A	L4	N2 L4 larva polyA+	Whole organism	L4	hermaphrodite	1	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"12,905,254"	No	N/A	Y;19181841
+SRS004864	L4	LifeStages	L4	C. elegans N2	N/A	L4b	N2 L4 larva polyA+ technical replicate	Whole organism	L4	hermaphrodite	1	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"27,893,071"	No	N/A	Y;  21177976
+SRS003000	L4_male	LifeStages	L4Male	C. elegans N2	N/A	L4MALE	N2 L4 larva males polyA+	Whole organism	L4	male	1	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"34,248,161"	No	N/A	Y; 21177976
+SRS174140	L4_male	LifeStages	L4Male	C. elegans N2	N/A	L4MALE5	N2 L4 larva males polyA+ biological replicate	Whole organism	L4	male	5	PolyA(+)	1X76	Unstranded	N.D.	N/A	0	"27,153,001"	No	N/A	Y;  21177976
+SRS001789	YA	LifeStages	YA	C. elegans N2	N/A	YA	N2 young adult (pre-gravid) polyA+	Whole organism	YA	hermaphrodite	0	PolyA(+)	1X36	Unstranded	N.D.	N/A	0	"20,906,779"	No	N/A	Y;19181841
+SRS178501	YA	LifeStages	YA	C. elegans N2	N/A	N2_Yad-1	N2 young adult (pre-gravid) polyA+ biological replicate	Whole organism	YA	hermaphrodite	1	PolyA(+)	1X76	Unstranded	N.D.	N/A	0	"22,632,528"	No	N/A	Y;  21177976

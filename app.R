@@ -28,7 +28,6 @@ suppressPackageStartupMessages({
     library(dendextend)
     library(vctrs)
     library(markdown)
-    library(LaCroixColoR)
     source("Server/ggheatmap_local.R")
     source("Server/calc_DEG_tbl.R")
     source("Server/theme_Publication.R")
@@ -130,17 +129,6 @@ server <- function(input, output, session) {
     ## LS: Save Excel Tables with DEG Tables
     source('Server/plot_save_DEGs_ls.R', local = T)
     
-    ## LS: Functional Enrichment Analysis ----
-    ## LS: Run GSEA
-    ## LS: GSEA Plot
-    ## LS: Save GSEA Plot
-    ## LS: GSEA Data Table
-    ## LS: Save GSEA Datatable
-    if (!config::is_active("shinyapps")){
-        source('Server/functional_enrichment_ls.R', local = T)
-    } else {
-        
-    }
     ## Output Options ----
     outputOptions(output, "downloadbuttonsGenes", suspendWhenHidden = FALSE)
     outputOptions(output, "volcano_GW", suspendWhenHidden = FALSE)

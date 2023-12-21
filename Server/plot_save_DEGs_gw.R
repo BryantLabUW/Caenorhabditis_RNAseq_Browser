@@ -2,7 +2,7 @@
 pull_DEGs_GW <- reactive({
     req(vals$comparison_GW)
     req(vals$list.myTopHits.df_GW)
-    req(vals$v.DEGList.filtered.norm)
+    req(vals$v.DGEList.filtered.norm)
     setProgress(0.5)
     if (isTruthy(input$displayedComparison_GW)){
         vals$displayedComparison_GW <- match(input$displayedComparison_GW,
@@ -24,7 +24,7 @@ pull_DEGs_GW <- reactive({
     vplot <- ggplot(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]) +
         aes(y=BH.adj.P.Val, x=logFC) +
         scale_y_continuous(trans = trans_reverser('log10')) + { 
-            if (vals$includeBkgnd == TRUE) geom_point(size=3,
+            if (vals$includeBkgnd == TRUE) geom_point(size=2, color="grey",
                    na.rm = T) } +
         geom_point(data = vals$list.highlight.tbl_GW[[vals$displayedComparison_GW]], 
                    mapping = aes(y=(BH.adj.P.Val), 
@@ -34,15 +34,15 @@ pull_DEGs_GW <- reactive({
                    na.rm = T) +
         geom_hline(yintercept = -log10(adj.P.thresh), 
                    linetype="longdash", 
-                   colour="grey", 
+                   colour="black", 
                    size=1) + 
         geom_vline(xintercept = lfc.thresh, 
                    linetype="longdash", 
-                   colour="#D64358FF", 
+                   colour="#BE684D", 
                    size=1) +
         geom_vline(xintercept = -lfc.thresh, 
                    linetype="longdash", 
-                   colour="#4F5791FF", 
+                   colour="#2C467A", 
                    size=1) + {
                        if (vals$scaletogenome == TRUE) expand_limits(x = c(min(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$logFC), max(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$logFC)), y = c(min(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$BH.adj.P.Val), max(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$BH.adj.P.Val))) } +
         guides(size = "none",
@@ -51,13 +51,13 @@ pull_DEGs_GW <- reactive({
                             gsub('-',
                                  ' vs ',
                                  vals$comparison_GW[vals$displayedComparison_GW])),
-             subtitle = paste0("grey line: p = ",
+             subtitle = paste0("black line: p = ",
                                adj.P.thresh, "; colored lines: log-fold change = +/-",  lfc.thresh),
              color = "GeneIDs",
              y = "BH-adjusted p-value",
              x = "log2FC") +
         theme_Publication() +
-    scale_color_manual(values = lacroix_palette("PassionFruit")) +
+      scale_color_manual(values = paletteer_d("rcartocolor::Prism")) +
         theme(aspect.ratio=1/3)
     setProgress(0.9)
     vplot
@@ -98,7 +98,7 @@ output$volcano_GW <- renderUI({
 output$bkgndVolcanoGW <- renderUI({
     req(input$goLifeStage_GW, vals$comparison_GW,vals$genelist)
     checkboxInput("bkgndVolcanoYN_GW",
-                  p("Show the DEG values for the entire genome as black dots in the plot background."), value = TRUE)
+                  p("Show the DEG values for the entire genome as grey dots in the plot background."), value = TRUE)
 })
 
 output$scaleVolcanoGW <- renderUI({
@@ -178,6 +178,9 @@ output$hover_info <- renderUI({
         p(HTML(paste0("<b> GeneID: </b>", 
                       point$geneID, 
                       "<br/>", 
+                      "<b> Gene Name: </b>",
+                      point$geneName,
+                      "<br/>",
                       "<b> Log FC: </b>",
                       round(point$logFC,digits = 2),
                       "<br/>",
@@ -189,7 +192,6 @@ output$hover_info <- renderUI({
 
 ## GW: Data Table of Differentially Expressed Genes from User Subset ----
 assemble_DEGs_GW <- reactive({
-    
     req(vals$comparison_GW,vals$displayedComparison_GW,vals$genelist)
     
     tS<- vals$targetStage_GW[vals$displayedComparison_GW,
@@ -206,24 +208,28 @@ assemble_DEGs_GW <- reactive({
                                        by = "geneID") %>%
         left_join(vals$annotations, by = "geneID") # Add gene annotations
     
-    sample.num.tS <- sapply(tS, function(x) {colSums(vals$v.DEGList.filtered.norm$design)[[x]]}) %>% sum()
-    sample.num.cS <- sapply(cS, function(x) {colSums(vals$v.DEGList.filtered.norm$design)[[x]]}) %>% sum()
+    sample.num.tS <- sapply(tS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
+    sample.num.cS <- sapply(cS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
    
-    n_num_cols <- sample.num.tS + sample.num.cS + 5
+    n_num_cols <- sample.num.tS + sample.num.cS + 6
     index_homologs <- length(colnames(vals$list.highlight.tbl_GW[[vals$displayedComparison_GW]])) - 6
+    
+    source('Server/switch_species.R', local = T)
     
     highlight.datatable <- vals$list.highlight.tbl_GW[[vals$displayedComparison_GW]] %>%
         {suppressMessages(dplyr::full_join(.,excluded.genes))} %>%
-        dplyr::mutate(In.subclade_geneID = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", In.subclade_geneID,"' target = '_blank'>", In.subclade_geneID,"</a>"))%>%
-        dplyr::mutate(Out.subclade_geneID = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", Out.subclade_geneID,"' target = '_blank'>", Out.subclade_geneID,"</a>"))%>%
-        dplyr::mutate(Out2.subclade_geneID = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", Out2.subclade_geneID,"' target = '_blank'>", Out2.subclade_geneID,"</a>"))%>%
-        dplyr::mutate(Ce_geneID = paste0("<a href='https://parasite.wormbase.org/Caenorhabditis_elegans_prjna13758/Gene/Summary?g=", Ce_geneID,"' target = '_blank'>", Ce_geneID,"</a>"))%>%
-        dplyr::mutate(WBPSLink = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", geneID,"' target = '_blank'>", geneID,"</a>")) %>%
-        dplyr::relocate(UniProtKB, Description, InterPro, GO_term,
-                        In.subclade_geneID, In.subclade_percent_homology,
-                        Out.subclade_geneID, Out.subclade_percent_homology,
-                        Out2.subclade_geneID, Out2.subclade_percent_homology,
-                        Ce_geneID, Ce_percent_homology, .after = last_col())  %>%
+      dplyr::mutate(WormBaseLink = paste0("<a href='https://wormbase.org/species/C_", species, "/gene/", geneID,"' target = '_blank'>", geneID,"</a>"))%>%
+      dplyr::relocate(stableID, Description,
+                      GS1_homologID, GS1_percent_homology,
+                      GS2_homologID, GS2_percent_homology,
+                      GS3_homologID, GS3_percent_homology,
+                      GS4_homologID, GS4_percent_homology, .after = last_col())  %>%
+      dplyr::mutate(GS1_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS1, "/gene/", sub("\\S* \\| " ,"", GS1_homologID),"' target = '_blank'>", GS1_homologID,"</a>"))%>%
+      dplyr::mutate(GS2_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS2, "/gene/", sub("\\S* \\| " ,"", GS2_homologID),"' target = '_blank'>", GS2_homologID,"</a>"))%>%
+      dplyr::mutate(GS3_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS3, "/gene/", sub("\\S* \\| " ,"", GS3_homologID),"' target = '_blank'>", GS3_homologID,"</a>"))%>%
+      dplyr::mutate(GS4_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS4, "/gene/", sub("\\S* \\| " ,"", GS4_homologID),"' target = '_blank'>", GS4_homologID,"</a>"))%>%
+      dplyr::relocate(geneName, .after = geneID)%>%
+      dplyr::relocate(WormBaseLink, .before = Description) %>%
         DT::datatable(rownames = FALSE,
                       escape = FALSE,
                       caption = htmltools::tags$caption(
@@ -255,10 +261,15 @@ assemble_DEGs_GW <- reactive({
                                          paste0("$(this.api().table().container()).css({'font-size': '", "10pt", "'});"),
                                          "}"),
                                      columnDefs = list(
+                                       list(
+                                         targets = n_num_cols+1,
+                                         render = JS(
+                                           "function(data, row) {",
+                                           "data.toExponential(1);",
+                                           "}")
+                                       ),
                                          list(
-                                             targets = ((n_num_cols + 
-                                                             5):(n_num_cols + 
-                                                                     6)),
+                                             targets = n_num_cols + 4,
                                              render = JS(
                                                  "function(data, type, row, meta) {",
                                                  "return type === 'display' && data.length > 20 ?",
@@ -280,9 +291,9 @@ assemble_DEGs_GW <- reactive({
                                      ))
                                      
                       )) 
-
+    
     highlight.datatable <- highlight.datatable %>%
-        DT::formatRound(columns=c(3:(n_num_cols-3),
+        DT::formatRound(columns=c(4:(n_num_cols-3),
                                   n_num_cols), 
                         digits=3)
     
@@ -290,7 +301,8 @@ assemble_DEGs_GW <- reactive({
         DT::formatRound(columns=c(n_num_cols+2, 
                                   index_homologs+1,
                                   index_homologs+3,
-                                  index_homologs+5), 
+                                  index_homologs+5,
+                                  index_homologs+7), 
                         digits=2)
     
     highlight.datatable <- highlight.datatable %>%

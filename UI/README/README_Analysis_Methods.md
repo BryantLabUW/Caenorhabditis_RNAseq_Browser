@@ -13,12 +13,12 @@ reported p-values are adjusted for multiple comparisons using the
 Benjamini-Hochberg method. If users are performing multiple closely
 related pairwise comparisons they may select the option to correct for
 multiple contrasts using the global method (using the slider input
-provided). For each gene, we detemine whether expression is upregulated,
-downregulated, or not significantly different based on a cutoff of
+provided). For each gene, we determine whether expression is up-regulated,
+down-regulated, or not significantly different based on a cutoff of
 p&lt;0.05.
 
 ### Data Visualization
 
-For heatmaps of log2CPM gene expression values, columns
+For heat maps of log2CPM gene expression values, columns
 (life stages) are ordered using Spearman clustering of the user-defined subset. Rows are ordered using Pearson
 clustering of expression of the user-selected gene subset.

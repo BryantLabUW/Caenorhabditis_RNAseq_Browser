@@ -1,16 +1,18 @@
 ## GW: Heatmap/Table of Gene Expression ----
 generateHeatmapTable <- reactive({
-  req(vals$genelist,input$displayedGene,vals$genelist.Log2CPM,vals$v.DEGList.filtered.norm)
+  req(vals$genelist,input$displayedGene,vals$genelist.Log2CPM,vals$v.DGEList.filtered.norm)
   
   # Set gene to display
   vals$gene_of_interest <- vals$genelist$geneID
-  #browser()
+
   if (input$displayedGene == "Data Table") {
+   
     excluded.genes <- dplyr::anti_join(vals$submitted.genelist, 
                                        vals$genelist,
                                        by = "geneID") %>%
       left_join(vals$annotations, by = "geneID") # Add gene annotations
     setProgress(0.2)
+    source('Server/switch_species.R', local = T)
     gene_vals <- vals$genelist.Log2CPM %>%
       dplyr::filter(geneID %in% vals$gene_of_interest) %>%
       dplyr::summarize(mean = mean(log2CPM), .groups = "drop_last") %>%
@@ -18,21 +20,17 @@ generateHeatmapTable <- reactive({
                   id_cols = geneID,
                   values_from = mean) %>%
       left_join(vals$annotations, by = "geneID") %>%
-        dplyr::mutate(WBPSLink = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", geneID,"' target = '_blank'>", geneID,"</a>"))%>%
-      dplyr::relocate(UniProtKB, Description, InterPro, GO_term,
-                      In.subclade_geneID, In.subclade_percent_homology,
-                      Out.subclade_geneID, Out.subclade_percent_homology,
-                      Out2.subclade_geneID, Out2.subclade_percent_homology,
-                      Ce_geneID, Ce_percent_homology, .after = last_col())  %>%
-        dplyr::mutate(In.subclade_geneID = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", In.subclade_geneID,"' target = '_blank'>", In.subclade_geneID,"</a>"))%>%
-        dplyr::mutate(Out.subclade_geneID = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", Out.subclade_geneID,"' target = '_blank'>", Out.subclade_geneID,"</a>"))%>%
-        dplyr::mutate(Out2.subclade_geneID = paste0("<a href='https://parasite.wormbase.org/Multi/Search/Results?species=all;idx=;q=", Out2.subclade_geneID,"' target = '_blank'>", Out2.subclade_geneID,"</a>"))%>%
-        dplyr::mutate(Ce_geneID = paste0("<a href='https://parasite.wormbase.org/Caenorhabditis_elegans_prjna13758/Gene/Summary?g=", Ce_geneID,"' target = '_blank'>", Ce_geneID,"</a>"))%>%
-        dplyr::relocate(ends_with("WBgeneID"), .before = In.subclade_geneID)%>%
+        dplyr::mutate(WormBaseLink = paste0("<a href='https://wormbase.org/species/C_", species, "/gene/", geneID,"' target = '_blank'>", geneID,"</a>"))%>%
+        dplyr::mutate(GS1_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS1, "/gene/", sub("\\S* \\| " ,"", GS1_homologID),"' target = '_blank'>", GS1_homologID,"</a>"))%>%
+        dplyr::mutate(GS2_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS2, "/gene/", sub("\\S* \\| " ,"", GS2_homologID),"' target = '_blank'>", GS2_homologID,"</a>"))%>%
+        dplyr::mutate(GS3_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS3, "/gene/", sub("\\S* \\| " ,"", GS3_homologID),"' target = '_blank'>", GS3_homologID,"</a>"))%>%
+        dplyr::mutate(GS4_homologID = paste0("<a href='https://wormbase.org/species/C_", species.GS4, "/gene/", sub("\\S* \\| " ,"", GS4_homologID),"' target = '_blank'>", GS4_homologID,"</a>"))%>%
+        dplyr::relocate(geneName, .after = geneID) %>%
+        dplyr::relocate(WormBaseLink, .before = Description) %>%
          {suppressMessages(dplyr::full_join(.,excluded.genes))} 
     
     n_num_cols <- ncol(gene_vals)
-    n_num_values <- nlevels(vals$v.DEGList.filtered.norm$targets$group)
+    n_num_values <- nlevels(vals$v.DGEList.filtered.norm$targets$group)
     setProgress(0.4)
     gene_vals.datatable <- gene_vals %>%
       DT::datatable(rownames = FALSE,
@@ -54,7 +52,7 @@ generateHeatmapTable <- reactive({
                                      "}"),
                                    columnDefs = list(
                                      list(
-                                       targets = ((n_num_values+4):(n_num_values+5)),
+                                       targets = n_num_values+3,
                                        render = JS(
                                          "function(data, type, row, meta) {",
                                          "return type === 'display' && data.length > 20 ?",
@@ -80,7 +78,7 @@ generateHeatmapTable <- reactive({
       )
     setProgress(0.8)
     gene_vals.datatable <-  gene_vals.datatable %>%
-      DT::formatRound(columns=c(2:(n_num_values+1)), 
+      DT::formatRound(columns=c(3:(n_num_values+2)), 
                       digits=3)
     
     gene_vals.datatable <-  gene_vals.datatable %>%
@@ -97,18 +95,18 @@ generateHeatmapTable <- reactive({
     diffGenes <- vals$diffGenes.df %>%
       dplyr::select(!geneID) %>%
       as.matrix()
-    rownames(diffGenes) <- rownames(vals$v.DEGList.filtered.norm$E)
+    rownames(diffGenes) <- rownames(vals$v.DGEList.filtered.norm$E)
     subset.diffGenes<- diffGenes[vals$gene_of_interest,]
     
     setProgress(0.2)
     clustColumns <- hclust(as.dist(1-cor(subset.diffGenes, method="spearman")), method="complete")
     
-    colnames(subset.diffGenes) <- paste0(vals$v.DEGList.filtered.norm$targets$group,
+    colnames(subset.diffGenes) <- paste0(vals$v.DGEList.filtered.norm$targets$group,
                                          "...",
-                                         substr(vals$v.DEGList.filtered.norm$targets$samples, 
+                                         substr(vals$v.DGEList.filtered.norm$targets$samples, 
                                                 nchar(
-                                                  as.character(vals$v.DEGList.filtered.norm$targets$samples[1]))-2, nchar(
-                                                    as.character(vals$v.DEGList.filtered.norm$targets$samples[1])))
+                                                  as.character(vals$v.DGEList.filtered.norm$targets$samples[1]))-2, nchar(
+                                                    as.character(vals$v.DGEList.filtered.norm$targets$samples[1])))
     )
     
     setProgress(0.4)
@@ -125,11 +123,11 @@ generateHeatmapTable <- reactive({
     hovertext <- as.data.frame(subset.diffGenes) %>%
       round(digits = 2)
     
-    colnames(hovertext) <- vals$v.DEGList.filtered.norm$targets$samples
+    colnames(hovertext) <- vals$v.DGEList.filtered.norm$targets$samples
     hovertext[] <- lapply(seq_along(hovertext), function(x){
       paste0("GeneID: ", rownames(hovertext), "<br>",
              "Log2CPM: ", hovertext[,x], "<br>",
-             "Life Stage: ", vals$v.DEGList.filtered.norm$targets$group[x],
+             "Life Stage: ", vals$v.DGEList.filtered.norm$targets$group[x],
              "<br>",
              "Sample: ", colnames(hovertext)[x])
     })
@@ -180,8 +178,8 @@ generateGenePlot <- reactive({
                                        stroke = .75,
                                        show.legend = F,
                                        aes(color = life_stage)) +
-                           scale_fill_carto_d(palette = "Vivid") + 
-                           scale_color_carto_d(palette = "Vivid") +
+                           scale_fill_carto_d(palette = "Prism") + 
+                           scale_color_carto_d(palette = "Prism") +
                            labs(y="log2 CPM expression", x = "Life Stage",
                                 title= "Log2 Counts per Million (CPM) Expression",
                                 subtitle=paste("Selected gene:",
@@ -194,7 +192,7 @@ generateGenePlot <- reactive({
 
 
 ## GW: Gene Homologs Expression Plots ----
-##  Take a list of user-provided genes, identify gene homologs in other *Strongyloides*
+##  Take a list of user-provided genes, identify gene homologs in other *Caenorhabditis*
 ## species, collect expression data from those gene homologs, and plot
 fetch_homologs <- reactive({
   req(vals$genelist.Log2CPM, vals$genelist)
@@ -203,90 +201,92 @@ fetch_homologs <- reactive({
     dplyr::filter(geneID %in% vals$genelist$geneID) %>%
     left_join(vals$annotations, by = "geneID") %>%
     dplyr::select(geneID, life_stage,log2CPM,
-                  In.subclade_geneID, Out.subclade_geneID,
-                  Out2.subclade_geneID)
-  
+                  GS1_homologID, GS2_homologID,
+                  GS3_homologID, GS4_homologID)
+
   genelist.allspecies <- Primary.species %>%
     ungroup() %>%
-    dplyr::select(geneID, In.subclade_geneID, Out.subclade_geneID, Out2.subclade_geneID) %>%
-    unique()
+    dplyr::select(geneID, GS1_homologID, GS2_homologID, GS3_homologID, GS4_homologID) %>%
+    unique() %>%
+    separate_wider_delim(GS1_homologID:GS4_homologID, " | ", names = c(NA, ""),names_sep = "")
   
   vals$homologous_genes <- genelist.allspecies
   
-  # Identify the identity of the primary species, the in.subclade species, and the two out.subclade species
-  species <- switch(input$selectSpecies_GW,
-                    `S. stercoralis` = 'Ss',
-                    `S. ratti` = 'Sr',
-                    `S. papillosus` = "Sp",
-                    `S. venezuelensis` = "Sv")
-  species.In.subclade <- switch(species,
-                                'Ss' = 'Sr',
-                                'Sr' = 'Ss',
-                                'Sp' = 'Sv',
-                                'Sv' = 'Sp')
-  species.Out.subclade <- switch(species,
-                                 'Ss' = 'Sp',
-                                 'Sr' = 'Sp',
-                                 'Sp' = 'Ss',
-                                 'Sv' = 'Ss')
-  species.Out2.subclade <- switch(species,
-                                  'Ss' = 'Sv',
-                                  'Sr' = 'Sv',
-                                  'Sp' = 'Sr',
-                                  'Sv' = 'Sr')
+  # Identify the identity of the primary species, and the homologous species
+  source('Server/switch_species.R', local = T)
   
-  # Load expression data for In/Out Sublade species
-  load(file = paste0("./Data/",species.In.subclade,"_vDGEList"))
-  species.In.Log2CPM<-v.DEGList.filtered.norm$E %>%
+  # Load expression data for GS1-4 species
+  load(file = paste0("./Data/",species.GS1,"_vDGEList"))
+  species.GS1.Log2CPM<-v.DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DEGList.filtered.norm$targets$group))) %>%
+                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
-    dplyr::filter(geneID %in% genelist.allspecies$In.subclade_geneID)
-  remove(v.DEGList.filtered.norm)
+    dplyr::filter(geneID %in% genelist.allspecies$GS1_homologID)
+  remove(v.DGEList.filtered.norm)
   
-  load(file = paste0("./Data/",species.Out.subclade,"_vDGEList"))
-  species.Out.Log2CPM<-v.DEGList.filtered.norm$E %>%
+  load(file = paste0("./Data/",species.GS2,"_vDGEList"))
+  species.GS2.Log2CPM<-v.DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DEGList.filtered.norm$targets$group))) %>%
+                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
-    dplyr::filter(geneID %in% genelist.allspecies$Out.subclade_geneID)
-  remove(v.DEGList.filtered.norm)
+    dplyr::filter(geneID %in% genelist.allspecies$GS2_homologID)
+  remove(v.DGEList.filtered.norm)
   
-  load(file = paste0("./Data/",species.Out2.subclade,"_vDGEList"))
-  species.Out2.Log2CPM<-v.DEGList.filtered.norm$E %>%
+  load(file = paste0("./Data/",species.GS3,"_vDGEList"))
+  species.GS3.Log2CPM<-v.DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DEGList.filtered.norm$targets$group))) %>%
+                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
-    dplyr::filter(geneID %in% genelist.allspecies$Out2.subclade_geneID)
-  remove(v.DEGList.filtered.norm)
+    dplyr::filter(geneID %in% genelist.allspecies$GS3_homologID)
+  remove(v.DGEList.filtered.norm)
+  
+  load(file = paste0("./Data/",species.GS4,"_vDGEList"))
+  species.GS4.Log2CPM<-v.DGEList.filtered.norm$E %>%
+    as_tibble(rownames = "geneID")%>%
+    setNames(nm = c("geneID", 
+                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
+    pivot_longer(cols = -geneID,
+                 names_to = "life_stage", 
+                 values_to = "log2CPM") %>%
+    group_by(geneID, life_stage) %>%
+    dplyr::filter(grepl(genelist.allspecies$GS4_homologID[1], geneID))
+  remove(v.DGEList.filtered.norm)
   
   
   life_stage_types <- lifestage_legend %>%
     dplyr::select(-group) %>%
     colnames()
-  
+
   plot.tbl <- bind_rows(
     Primary.species =vals$genelist.Log2CPM,
-    In.subclade = species.In.Log2CPM,
-    Out.subclade = species.Out.Log2CPM,
-    Out2.subclade = species.Out2.Log2CPM,
+    GS1.species = species.GS1.Log2CPM,
+    GS2.species = species.GS2.Log2CPM,
+    GS3.species = species.GS3.Log2CPM,
+    GS4.species = species.GS4.Log2CPM,
     .id = "id") %>%
-    dplyr::mutate(id = factor(id, levels = c("Primary.species",
-                                             "In.subclade",
-                                             "Out.subclade",
-                                             "Out2.subclade")))%>%
+    dplyr::mutate(across("id", str_replace_all, c("Primary.species" = paste0("C. ",species), 
+                                                  "GS1.species" = paste0("C. ",species.GS1),
+                                                  "GS2.species" = paste0("C. ",species.GS2),
+                                                  "GS3.species" = paste0("C. ",species.GS3),
+                                                  "GS4.species" = paste0("C. ",species.GS4)
+                                                  ))) %>%
+    dplyr::mutate(id = factor(id, levels = c(paste0("C. ",species),
+                                             paste0("C. ",species.GS1),
+                                             paste0("C. ",species.GS2),
+                                             paste0("C. ",species.GS3),
+                                             paste0("C. ",species.GS4))))%>%
     dplyr::mutate(life_stage= factor(life_stage, levels = life_stage_types))
   
 })
@@ -301,9 +301,8 @@ output$CPM.homologs <- renderPlot({
                                    geneID %in% input$displayedGene)%>%
       as.character()
     
-    
     plot.tbl <- plot.tbl %>%
-      dplyr::filter(geneID %in% set_displayed)
+      dplyr::filter(geneID %in% set_displayed) 
     
     mylevels <- unique(plot.tbl[order(plot.tbl$id), "geneID"])
     plot.tbl <- plot.tbl %>%
@@ -322,13 +321,13 @@ output$CPM.homologs <- renderPlot({
                                        stroke = .75,
                                        show.legend = F,
                                        aes(color = life_stage)) +
-                           scale_fill_carto_d(palette = "Vivid") + 
-                           scale_color_carto_d(palette = "Vivid") + 
+                           #scale_fill_carto_d(palette = "Vivid") + 
+                           #scale_color_carto_d(palette = "Vivid") +
                            labs(y="log2 CPM expression", x = "Life Stage",
                                 title= "Expression of Homologous Genes Across Species",
                                 subtitle=paste("Selected gene:",
                                                vals$gene_of_interest)) +
-                           facet_wrap(~geneID, 
+                           facet_wrap(~id + geneID, 
                                       nrow = 1,
                                       scales = "free_x") +
                            theme_Publication() + 
@@ -419,9 +418,9 @@ observe({
                                    type = "pills",
                                    tabPanel("Selected Gene", 
                                             plotOutput('CPM')),
-                                   tabPanel(p(em("Strongyloides"), "Homologs"), 
+                                   tabPanel(p(em("Caenorhabditis"), "Homologs"), 
                                             plotOutput('CPM.homologs'),
-                                            em('Note: homologous genes are identified based on WormBase ParaSite annotations and may not be accurate.'))
+                                            em('Note: homologous genes are identified based on WormBase annotations and may not be accurate.'))
                        )
                        
       ))
@@ -444,7 +443,7 @@ output$downloadGenePlot <- downloadHandler(
       type <- 'GeneExpression_'
     } else {
     type <- switch(input$genePlotTab,
-           `Strongyloides Homologs` = "HomologExpression_",
+           `Caenorhabditis Homologs` = "HomologExpression_",
           `Selected Gene` = 'GeneExpression_'
            )}
     paste(type,input$displayedGene, '_',Sys.Date(),'.pdf', sep='')
@@ -458,21 +457,21 @@ output$downloadGenePlot <- downloadHandler(
         myheatcolors <- RdBu(75)
         diffGenes <- vals$diffGenes.df %>%
           dplyr::select(!geneID)
-        colnames(diffGenes) <- vals$v.DEGList.filtered.norm$target$group
+        colnames(diffGenes) <- vals$v.DGEList.filtered.norm$target$group
         diffGenes <- diffGenes %>%
           as.matrix()
         
-        rownames(diffGenes) <- rownames(vals$v.DEGList.filtered.norm$E)
+        rownames(diffGenes) <- rownames(vals$v.DGEList.filtered.norm$E)
         subset.diffGenes<- diffGenes[vals$gene_of_interest,]
         
         clustColumns <- hclust(as.dist(1-cor(subset.diffGenes, method="spearman")), method="complete")
         
-        colnames(subset.diffGenes) <- paste0(vals$v.DEGList.filtered.norm$targets$group,
+        colnames(subset.diffGenes) <- paste0(vals$v.DGEList.filtered.norm$targets$group,
                                              "...",
-                                             substr(vals$v.DEGList.filtered.norm$targets$samples,
+                                             substr(vals$v.DGEList.filtered.norm$targets$samples,
                                                     nchar(
-                                                      as.character(vals$v.DEGList.filtered.norm$targets$samples[1]))-2, nchar(
-                                                        as.character(vals$v.DEGList.filtered.norm$targets$samples[1])))
+                                                      as.character(vals$v.DGEList.filtered.norm$targets$samples[1]))-2, nchar(
+                                                        as.character(vals$v.DGEList.filtered.norm$targets$samples[1])))
         )
         
         setProgress(0.4)
@@ -512,7 +511,7 @@ output$downloadGenePlot <- downloadHandler(
                  width = 5,
                  height = 4,
                  device = cairo_pdf)
-        } else if (input$genePlotTab == "Strongyloides Homologs"){
+        } else if (input$genePlotTab == "Caenorhabditis Homologs"){
           p<-vals$homolog_plot
           ggsave(file,
                  plot = p,
@@ -532,7 +531,7 @@ output$downloadGenePlot <- downloadHandler(
 output$downloadbuttonsGenes <- renderUI({
   req(vals$genelist,vals$genelist.Log2CPM,input$displayedGene)
   if (nrow(vals$genelist)>1) {req(vals$HeatmapRowOrder)}
-  if ((input$displayedGene != "All Genes" | input$displayedGene != "Data Table") & (isTruthy(input$genePlotTab) && input$genePlotTab == "Strongyloides Homologs")){
+  if ((input$displayedGene != "All Genes" | input$displayedGene != "Data Table") & (isTruthy(input$genePlotTab) && input$genePlotTab == "Caenorhabditis Homologs")){
     save.tbl <- fetch_homologs()
     
     #Identify which set of homologs to download the data for
@@ -558,7 +557,7 @@ output$downloadbuttonsGenes <- renderUI({
     genelist.expression <- list(genelist.expression)
     
   } else {
-    vals$genelist.Log2CPM$sampleID <- rep(as.character(vals$v.DEGList.filtered.norm$targets$samples),
+    vals$genelist.Log2CPM$sampleID <- rep(as.character(vals$v.DGEList.filtered.norm$targets$samples),
                                           times =  nrow(vals$genelist))
     
     genelist.expression <-  vals$genelist.Log2CPM %>%
@@ -596,18 +595,11 @@ output$downloadbuttonsGenes <- renderUI({
     })
     
     vals$expressionnotes <- "Data are log2 counts per million"
-    
     # Add gene annotations
     genelist.expression <-lapply(genelist.expression, function (x) {
       vals$annotations %>%
-        dplyr::relocate(UniProtKB, Description, InterPro, GO_term,
-                        In.subclade_geneID, In.subclade_percent_homology,
-                        Out.subclade_geneID, Out.subclade_percent_homology,
-                        Out2.subclade_geneID, Out2.subclade_percent_homology,
-                        Ce_geneID, Ce_percent_homology, .after = geneID) %>%
-        dplyr::relocate(ends_with("WBgeneID"), .before = In.subclade_geneID)%>%
-        dplyr::left_join(x,., by = "geneID")
-      
+        dplyr::left_join(x,., by = "geneID") %>%
+        dplyr::relocate(geneName, .after = geneID)
     })
   }
   output$heatmap_data_download <- generate_excel_report(c("User-selected Genes"),

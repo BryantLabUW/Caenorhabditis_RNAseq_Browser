@@ -8,8 +8,8 @@ observeEvent({input$resetLS
 
 ## LS: Generate Comparison Selection Boxes
 output$pairwiseSelector_LS<- renderUI({
-    req(vals$v.DEGList.filtered.norm)
-    
+    req(vals$v.DGEList.filtered.norm)
+  
     list(
         panel(
             heading = tagList(h5(shiny::icon("fas fa-sliders-h"), 
@@ -20,7 +20,7 @@ output$pairwiseSelector_LS<- renderUI({
             selectInput("selectTarget_LS",
                         h6("Select Target"),
                         choices = c('Choose one or more' = ''
-                                    ,as.list(levels(vals$v.DEGList.filtered.norm$targets$group))),
+                                    ,as.list(levels(vals$v.DGEList.filtered.norm$targets$group))),
                         selectize = TRUE,
                         multiple = TRUE),
             # Select Contrast Life Stage
@@ -29,11 +29,11 @@ output$pairwiseSelector_LS<- renderUI({
                         choices = c('Choose one or more' = ''
                                     ,'All Others (separately)' = 'everythingElse'
                                     ,'All Others (one group)' = 'remainingGroup'
-                                    ,as.list(levels(vals$v.DEGList.filtered.norm$targets$group))),
+                                    ,as.list(levels(vals$v.DGEList.filtered.norm$targets$group))),
                         selectize = TRUE,
                         multiple = TRUE),
             tags$hr(style="border-color: black;"),
-            p(tags$em('If using the textbox to type comma-separated contrasts, please use the format: (Target)-(Contrast). For example typing "iL3-PF, (iL3+iL3a)-(PF+FLF)" will run two pairwise comparisons: iL3 vs PF and iL3+iL3a vs PF+FLF. To correct for multiple, closely related pairwise comparisons, use the toggle switch below.', style = "color: #7b8a8b")),
+            p(tags$em('If using the textbox to type comma-separated contrasts, please use the format: (Target)-(Contrast). For example typing "Dauer-YA, (L1+L2)-(YA+YA_male)" will run two pairwise comparisons: Dauer vs YA and L1+L2 vs YA+YA_male. To correct for multiple, closely related pairwise comparisons, use the toggle switch below.', style = "color: #7b8a8b")),
             h5('B: Multiple Comparisons', class = 'text-info'),
             # Text Input for Multiple Contrasts
             textAreaInput('multiContrasts_LS',
@@ -128,7 +128,7 @@ parse_contrasts_LS<-eventReactive(input$goLS,{
         } else vals$multipleCorrection_LS <- F
     } else if (str_detect(input$selectContrast_LS[[1]], 'everythingElse')){
         targetStage <- rbind(input$selectTarget_LS)
-        contrastStage <- setdiff(levels(vals$v.DEGList.filtered.norm$targets$group),targetStage) %>%
+        contrastStage <- setdiff(levels(vals$v.DGEList.filtered.norm$targets$group),targetStage) %>%
             cbind()
         targetStage <- rep_len(targetStage,length(contrastStage)) %>%
             cbind()
@@ -146,7 +146,7 @@ parse_contrasts_LS<-eventReactive(input$goLS,{
         } else vals$multipleCorrection_LS <- F
     } else if (str_detect(input$selectContrast_LS[[1]], 'remainingGroup')){
         targetStage <- rbind(input$selectTarget_LS)
-        contrastStage <- setdiff(levels(vals$v.DEGList.filtered.norm$targets$group),targetStage) %>%
+        contrastStage <- setdiff(levels(vals$v.DGEList.filtered.norm$targets$group),targetStage) %>%
             rbind()
         comparison <- paste(paste0(targetStage, 
                                    collapse = "+") %>%
@@ -200,13 +200,13 @@ parse_contrasts_LS<-eventReactive(input$goLS,{
     # 2. Do contrasts include recognized life stages (corrects for spelling mistakes); compare relative to abbreviated names in lifestage_legend
     ## Do all target elements match a life stage in this dataset? 
     error.targets.validNames <- targetStage[targetStage != ""] %in% 
-        levels(vals$v.DEGList.filtered.norm$targets$group) 
+        levels(vals$v.DGEList.filtered.norm$targets$group) 
     shiny::validate(shiny::need(all(error.targets.validNames), 
                                 message = "At least one target name doesn't match available life stages. Please check inputs for spelling mistakes or incorrect capitalization.")) 
     
     ## Do all contrast elements match a life stage in this dataset?
     error.contrast.validNames <- contrastStage[contrastStage != ""] %in% 
-        levels(vals$v.DEGList.filtered.norm$targets$group) 
+        levels(vals$v.DGEList.filtered.norm$targets$group) 
     shiny::validate(shiny::need(all(error.contrast.validNames), 
                                 message = "At least one contrast name doesn't match available life stages. Please check inputs for spelling mistakes or incorrect capitalization.")) 
     
@@ -238,7 +238,7 @@ parse_contrasts_LS<-eventReactive(input$goLS,{
 
 ## LS: Generate Responsive Selection for Life Stage to Display ----
 output$contrastDisplaySelection_LS <- renderUI({
-    req(vals$v.DEGList.filtered.norm)
+    req(vals$v.DGEList.filtered.norm)
     input$resetLS
     input$speciesLS
     
@@ -260,9 +260,9 @@ output$contrastDisplaySelection_LS <- renderUI({
 
 ## LS: Generate Legend Explaining the Life Stages ----
 output$lifeStageLegend_LS <- renderDT({
-    req(vals$v.DEGList.filtered.norm)
+    req(vals$v.DGEList.filtered.norm)
     lifestage_legend.df <- lifestage_legend %>%
-        dplyr::select(any_of(unique(vals$v.DEGList.filtered.norm$targets$group))) %>%
+        dplyr::select(any_of(unique(vals$v.DGEList.filtered.norm$targets$group))) %>%
         as.data.frame()
     rownames(lifestage_legend.df)<- c("<b>Life Stage</b>")
     lifestage_legend.DT <- lifestage_legend.df %>%
@@ -279,7 +279,7 @@ output$lifeStageLegend_LS <- renderDT({
 })
 
 output$Legend_LS <- renderUI({
-    req(vals$v.DEGList.filtered.norm)
+    req(vals$v.DGEList.filtered.norm)
     panel(
         heading = tagList(h5(shiny::icon("fas fa-book-open"),
                              "Life Stage Legend")),

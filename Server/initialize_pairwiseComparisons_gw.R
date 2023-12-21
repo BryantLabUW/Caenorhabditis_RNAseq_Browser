@@ -9,7 +9,7 @@ observeEvent({input$resetGW
 
 ## GW: Generate Comparison Selection Boxes ----
 output$pairwiseSelector_GW<- renderUI({
-    req(vals$v.DEGList.filtered.norm)
+    req(vals$v.DGEList.filtered.norm)
     
     list(
         panel(
@@ -40,7 +40,7 @@ output$pairwiseSelector_GW<- renderUI({
             
             tags$hr(style="border-color: #2C3E50;"),
             h5('B: Multiple Comparisons', class = 'text-info'),
-            p(tags$em('If using the textbox to type comma-separated contrasts, please use the format: (Target)-(Contrast). For example typing "iL3-PF, (iL3+iL3a)-(PF+FLF)" will run two pairwise comparisons: iL3 vs PF and iL3+iL3a vs PF+FLF. To correct for multiple, closely related pairwise comparisons, use the toggle switch below.', style = "color: #7b8a8b")),
+            p(tags$em('If using the textbox to type comma-separated contrasts, please use the format: (Target)-(Contrast). For example typing "Dauer-YA, (L1+L2)-(YA+YA_male)" will run two pairwise comparisons: Dauer vs YA and L1+L2 vs YA+YA_male. To correct for multiple, closely related pairwise comparisons, use the toggle switch below.', style = "color: #7b8a8b")),
             # Text Input for Multiple Contrasts
             textAreaInput('multiContrasts_GW',
                           NULL,
@@ -135,7 +135,7 @@ parse_contrasts_GW <- eventReactive(input$goLifeStage_GW,{
         } else vals$multipleCorrection_GW <- F
     } else if (str_detect(input$selectContrast_GW[[1]], 'everythingElse')){
         targetStage <- rbind(input$selectTarget_GW)
-        contrastStage <- setdiff(levels(vals$v.DEGList.filtered.norm$targets$group),targetStage) %>%
+        contrastStage <- setdiff(levels(vals$v.DGEList.filtered.norm$targets$group),targetStage) %>%
             cbind()
         targetStage <- rep_len(targetStage,length(contrastStage)) %>%
             cbind()
@@ -153,7 +153,7 @@ parse_contrasts_GW <- eventReactive(input$goLifeStage_GW,{
         } else vals$multipleCorrection_GW <- F
     } else if (str_detect(input$selectContrast_GW[[1]], 'remainingGroup')){
         targetStage <- rbind(input$selectTarget_GW)
-        contrastStage <- setdiff(levels(vals$v.DEGList.filtered.norm$targets$group),targetStage) %>%
+        contrastStage <- setdiff(levels(vals$v.DGEList.filtered.norm$targets$group),targetStage) %>%
             rbind()
         comparison <- paste(paste0(targetStage, 
                          collapse = "+") %>%
@@ -206,13 +206,13 @@ parse_contrasts_GW <- eventReactive(input$goLifeStage_GW,{
     # 2. Do contrasts include recognized life stages (corrects for spelling mistakes); compare relative to abbreviated names in lifestage_legend
     ## Do all target elements match a life stage in this dataset? 
     error.targets.validNames <- targetStage[targetStage != ""] %in% 
-        levels(vals$v.DEGList.filtered.norm$targets$group) 
+        levels(vals$v.DGEList.filtered.norm$targets$group) 
     shiny::validate(shiny::need(all(error.targets.validNames), 
                                 message = "At least one target name doesn't match available life stages. Please check inputs for spelling mistakes or incorrect capitalization.")) 
     
     ## Do all contrast elements match a life stage in this dataset?
     error.contrast.validNames <- contrastStage[contrastStage != ""] %in% 
-        levels(vals$v.DEGList.filtered.norm$targets$group) 
+        levels(vals$v.DGEList.filtered.norm$targets$group) 
     shiny::validate(shiny::need(all(error.contrast.validNames), 
                                 message = "At least one contrast name doesn't match available life stages. Please check inputs for spelling mistakes or incorrect capitalization.")) 
     

@@ -16,12 +16,11 @@ observeEvent(input$speciesGW, {
     vals$comparison_GW <- NULL
     
     species <- switch(input$selectSpecies_GW,
-                      `S. stercoralis` = 'Ss',
-                      `C. elegans` = 'Cele',
-                      `C. briggsae` = 'Cbri',
-                      `C. brenneri` = 'Cbre',
-                      `C. japonica` = "Cjap",
-                      `C. remanei` = "Crem")
+                      `C. elegans` = 'elegans',
+                      `C. briggsae` = 'briggsae',
+                      `C. brenneri` = 'brenneri',
+                      `C. japonica` = "japonica",
+                      `C. remanei` = "remanei")
 
     
     withProgress({
@@ -29,34 +28,35 @@ observeEvent(input$speciesGW, {
         # Import a variance-stabilized DGEList created by voom transformation command.
         # Outputs: E = normalized CPMexpression values on the log2 scale
         load(file = paste0("./Data/",species,"_vDGEList"))
-        vals$v.DEGList.filtered.norm <- v.DEGList.filtered.norm
+        vals$v.DGEList.filtered.norm <- v.DGEList.filtered.norm
         
         setProgress(value = .25)
         
-        vals$target.contrast.options <- vals$v.DEGList.filtered.norm$targets$group
+        vals$target.contrast.options <- vals$v.DGEList.filtered.norm$targets$group
         # Import a tidy dataframe containing gene annotations for all genes in the genome (including those that are excluded from this database.)
+        
         load(file = paste0("./Data/",species,"_geneAnnotations"))
-        vals$annotations <- as_tibble(annotations, rownames = "geneID")
+        vals$annotations <- annotations
         
         setProgress(value = .5)
         
         # Parse vDGEList into a tibble containing Log2CPM information
-        vals$Log2CPM<-v.DEGList.filtered.norm$E %>%
+        vals$Log2CPM<-v.DGEList.filtered.norm$E %>%
             as_tibble(rownames = "geneID")%>%
             setNames(nm = c("geneID", 
-                            as.character(v.DEGList.filtered.norm$targets$group))) %>%
+                            as.character(v.DGEList.filtered.norm$targets$group))) %>%
             pivot_longer(cols = -geneID,
                          names_to = "life_stage", 
                          values_to = "log2CPM") %>%
             group_by(geneID, life_stage)
         
-        vals$diffGenes.df <- v.DEGList.filtered.norm$E %>%
+        vals$diffGenes.df <- v.DGEList.filtered.norm$E %>%
             as_tibble(rownames = "geneID", .name_repair = "unique")
         
         setProgress(value = .75)
         
         ## Fit a linear model to the data
-        vals$fit <- lmFit(v.DEGList.filtered.norm, v.DEGList.filtered.norm$design)
+        vals$fit <- lmFit(v.DGEList.filtered.norm, v.DGEList.filtered.norm$design)
         
         setProgress(value = 1)
         
@@ -70,24 +70,21 @@ StudyInfo.filename.GW <- reactive({
     req(input$selectSpecies_GW)
     
     species <- switch(input$selectSpecies_GW,
-                      `S. stercoralis` = 'Ss',
-                      `C. elegans` = 'Cele',
-                      `C. briggsae` = 'Cbri',
-                      `C. brenneri` = 'Cbre',
-                      `C. japonica` = "Cjap",
-                      `C. remanei` = "Crem")
+                      `C. elegans` = 'elegans',
+                      `C. briggsae` = 'briggsae',
+                      `C. brenneri` = 'brenneri',
+                      `C. japonica` = "japonica",
+                      `C. remanei` = "remanei")
     
     Info.type <- switch(input$which.Experimental.Info.GW,
-                        `Study Design` = '_studyDesign.txt',
-                        `Log2CPM Gene Counts` = 'RNAseq_log2cpm_filtered_norm_voom.csv',
-                        `vDGEList` = "_vDGEList",
-                        `Discarded Gene Counts` = "RNAseq_discardedGene_counts.csv")
+                        `Study Design` = '_study_design.txt',
+                        `Log2CPM Gene Counts` = '_log2cpm_filtered_norm_voom.csv',
+                        `vDGEList` = "_vDGEList")
     
     file.location <- switch(input$which.Experimental.Info.GW,
                             `Study Design` = './www/',
                             `Log2CPM Gene Counts` = './www/',
-                            `vDGEList` = "./Data/",
-                            `Discarded Gene Counts` = "./www/"
+                            `vDGEList` = "./Data/"
     )
     Info.file <- paste0(file.location,species, Info.type)
     Info.file
@@ -101,8 +98,7 @@ output$StudyInfo.panel.GW <- renderUI({
             file.location <- switch(input$which.Experimental.Info.GW,
                                     `Study Design` = './www/',
                                     `Log2CPM Gene Counts` = './www/',
-                                    `vDGEList` = "./Data/",
-                                    `Discarded Gene Counts` = "./www/"
+                                    `vDGEList` = "./Data/"
             )
             str_remove(Info.file, file.location)
         },
@@ -127,44 +123,43 @@ observeEvent(input$speciesLS, {
     updateTextAreaInput(session,"multiContrasts_LS",value = "")
     
     species <- switch(input$selectSpecies_LS,
-                      `S. stercoralis` = 'Ss',
-                      `C. elegans` = 'Cele',
-                      `C. briggsae` = 'Cbri',
-                      `C. brenneri` = 'Cbre',
-                      `C. japonica` = "Cjap",
-                      `C. remanei` = "Crem")
+                      `C. elegans` = 'elegans',
+                      `C. briggsae` = 'briggsae',
+                      `C. brenneri` = 'brenneri',
+                      `C. japonica` = "japonica",
+                      `C. remanei` = "remanei")
     
     withProgress({
-        # Import a variance-stabilized DEGList created by voom transformation command.
+        # Import a variance-stabilized DGEList created by voom transformation command.
         # Outputs: E = normalized CPMexpression values on the log2 scale
         load(file = paste0("./Data/",species,"_vDGEList"))
-        vals$v.DEGList.filtered.norm <- v.DEGList.filtered.norm
+        vals$v.DGEList.filtered.norm <- v.DGEList.filtered.norm
         
         setProgress(value = .25)
         
         # Import a tidy dataframe containing gene annotations for all genes in the genome (including those that are excluded from this database.)
         load(file = paste0("./Data/",species,"_geneAnnotations"))
-        vals$annotations <- as_tibble(annotations, rownames = "geneID")
+        vals$annotations <- annotations
         
         setProgress(value = .5)
-        
+       
         # Parse vDGEList into a tibble containing Log2CPM information
-        vals$Log2CPM<-v.DEGList.filtered.norm$E %>%
+        vals$Log2CPM<-v.DGEList.filtered.norm$E %>%
             as_tibble(rownames = "geneID")%>%
             setNames(nm = c("geneID", 
-                            as.character(v.DEGList.filtered.norm$targets$group))) %>%
+                            as.character(v.DGEList.filtered.norm$targets$group))) %>%
             pivot_longer(cols = -geneID,
                          names_to = "life_stage", 
                          values_to = "log2CPM") %>%
             group_by(geneID, life_stage)
         
-        vals$diffGenes.df <- v.DEGList.filtered.norm$E %>%
+        vals$diffGenes.df <- v.DGEList.filtered.norm$E %>%
             as_tibble(rownames = "geneID", .name_repair = "unique")
         
         setProgress(value = .75)
         
         ## Fit a linear model to the data
-        vals$fit <- lmFit(v.DEGList.filtered.norm, v.DEGList.filtered.norm$design)
+        vals$fit <- lmFit(v.DGEList.filtered.norm, v.DGEList.filtered.norm$design)
         
         setProgress(value = 1)
     }, message = "Loading Species Database")
@@ -177,24 +172,21 @@ StudyInfo.filename.LS <- reactive({
     req(input$selectSpecies_LS)
     
     species <- switch(input$selectSpecies_LS,
-                      `S. stercoralis` = 'Ss',
-                      `C. elegans` = 'Cele',
-                      `C. briggsae` = 'Cbri',
-                      `C. brenneri` = 'Cbre',
-                      `C. japonica` = "Cjap",
-                      `C. remanei` = "Crem")
+                      `C. elegans` = 'elegans',
+                      `C. briggsae` = 'briggsae',
+                      `C. brenneri` = 'brenneri',
+                      `C. japonica` = "japonica",
+                      `C. remanei` = "remanei")
     
     Info.type <- switch(input$which.Experimental.Info.LS,
-                        `Study Design` = '_studyDesign.txt',
-                        `Log2CPM Gene Counts` = 'RNAseq_log2cpm_filtered_norm_voom.csv',
-                        `vDGEList` = "_vDGEList",
-                        `Discarded Gene Counts` = "RNAseq_discardedGene_counts.csv")
+                        `Study Design` = '_study_design.txt',
+                        `Log2CPM Gene Counts` = '_log2cpm_filtered_norm_voom.csv',
+                        `vDGEList` = "_vDGEList")
     
     file.location <- switch(input$which.Experimental.Info.LS,
                             `Study Design` = './www/',
                             `Log2CPM Gene Counts` = './www/',
-                            `vDGEList` = "./Data/",
-                            `Discarded Gene Counts` = "./www/"
+                            `vDGEList` = "./Data/"
     )
     Info.file <- paste0(file.location,species, Info.type)
     Info.file
@@ -208,8 +200,7 @@ output$StudyInfo.panel.LS <- renderUI({
             file.location <- switch(input$which.Experimental.Info.LS,
                                     `Study Design` = './www/',
                                     `Log2CPM Gene Counts` = './www/',
-                                    `vDGEList` = "./Data/",
-                                    `Discarded Gene Counts` = "./www/"
+                                    `vDGEList` = "./Data/"
             )
             str_remove(Info.file, file.location)
         },
@@ -226,56 +217,40 @@ output$StudyInfo.panel.LS <- renderUI({
 # About Tab: Download experiment information ----
 StudyInfo.filename.About <- reactive({
     Info.type <- switch(input$which.Experimental.Info.About,
-                        `Ss Study Design` = 'Ss_studyDesign.txt',
-                        `Ss Log2CPM Gene Counts` = 'SsRNAseq_log2cpm_filtered_norm_voom.csv',
-                        `Ss vDGEList` = "Ss_vDGEList",
-                        `Ss Discarded Gene Counts` = "SsRNAseq_discardedGene_counts.csv",
-                        `Cele Study Design` = 'Cele_studyDesign.txt',
-                        `Cele Log2CPM Gene Counts` = 'CeleRNAseq_log2cpm_filtered_norm_voom.csv',
-                        `Cele vDGEList` = "Cele_vDGEList",
-                        `Cele Discarded Gene Counts` = "CeleRNAseq_discardedGene_counts.csv",
-                        `Cbri Study Design` = 'Cbri_studyDesign.txt',
-                        `Cbri Log2CPM Gene Counts` = 'CbriRNAseq_log2cpm_filtered_norm_voom.csv',
-                        `Cbri vDGEList` = "Cbri_vDGEList",
-                        `Cbri Discarded Gene Counts` = "CbriRNAseq_discardedGene_counts.csv",
-                        `Cbre Study Design` = 'Cbre_studyDesign.txt',
-                        `Cbre Log2CPM Gene Counts` = 'CbreRNAseq_log2cpm_filtered_norm_voom.csv',
-                        `Cbre vDGEList` = "Cbre_vDGEList",
-                        `Cbre Discarded Gene Counts` = "CbreRNAseq_discardedGene_counts.csv",
-                        `Cjap Study Design` = 'Cjap_studyDesign.txt',
-                        `Cjap Log2CPM Gene Counts` = 'CjapRNAseq_log2cpm_filtered_norm_voom.csv',
-                        `Cjap vDGEList` = "Cjap_vDGEList",
-                        `Cjap Discarded Gene Counts` = "CjapRNAseq_discardedGene_counts.csv",
-                        `Crem Study Design` = 'Crem_studyDesign.txt',
-                        `Crem Log2CPM Gene Counts` = 'CremRNAseq_log2cpm_filtered_norm_voom.csv',
-                        `Crem vDGEList` = "Crem_vDGEList",
-                        `Crem Discarded Gene Counts` = "CremRNAseq_discardedGene_counts.csv")
+                        `C. elegans Study Design` = 'elegans_study_design.txt',
+                        `C. elegans Log2CPM Gene Counts` = 'elegans_log2cpm_filtered_norm_voom.csv',
+                        `C. elegans vDGEList` = "elegans_vDGEList",
+                        `C. briggsae Study Design` = 'briggsae_study_design.txt',
+                        `C. briggsae Log2CPM Gene Counts` = 'briggsae_log2cpm_filtered_norm_voom.csv',
+                        `C. briggsae vDGEList` = "briggsae_vDGEList",
+                        `C. brenneri Study Design` = 'brenneri_study_design.txt',
+                        `C. brenneri Log2CPM Gene Counts` = 'brenneri_log2cpm_filtered_norm_voom.csv',
+                        `C. brenneri vDGEList` = "brenneri_vDGEList",
+                        `C. japonica Study Design` = 'japonica_study_design.txt',
+                        `C. japonica Log2CPM Gene Counts` = 'japonica_log2cpm_filtered_norm_voom.csv',
+                        `C. japonica vDGEList` = "japonica_vDGEList",
+                        `C. remanei Study Design` = 'remanei_study_design.txt',
+                        `C. remanei Log2CPM Gene Counts` = 'remanei_log2cpm_filtered_norm_voom.csv',
+                        `C. remanei vDGEList` = "remanei_vDGEList"
+                        )
+                        
     
     file.location <- switch(input$which.Experimental.Info.About,
-                            `Ss Study Design` = './www/',
-                            `Ss Log2CPM Gene Counts` = './www/',
-                            `Ss vDGEList` = "./Data/",
-                            `Ss Discarded Gene Counts` = "./www/",
-                            `Cele Study Design` = './www/',
-                            `Cele Log2CPM Gene Counts` = './www/',
-                            `Cele vDGEList` = "./Data/",
-                            `Cele Discarded Gene Counts` = "./www/",
-                            `Cbri Study Design` = './www/',
-                            `Cbri Log2CPM Gene Counts` = './www/',
-                            `Cbri vDGEList` = "./Data/",
-                            `Cbri Discarded Gene Counts` = "./www/",
-                            `Cbre Study Design` = './www/',
-                            `Cbre Log2CPM Gene Counts` = './www/',
-                            `Cbre vDGEList` = "./Data/",
-                            `Cbre Discarded Gene Counts` = "./www/",
-                            `Cjap Study Design` = './www/',
-                            `Cjap Log2CPM Gene Counts` = './www/',
-                            `Cjap vDGEList` = "./Data/",
-                            `Cjap Discarded Gene Counts` = "./www/",
-                            `Crem Study Design` = './www/',
-                            `Crem Log2CPM Gene Counts` = './www/',
-                            `Crem vDGEList` = "./Data/",
-                            `Crem Discarded Gene Counts` = "./www/"  
+                            `C. elegans Study Design` = './www/',
+                            `C. elegans Log2CPM Gene Counts` = './www/',
+                            `C. elegans vDGEList` = "./Data/",
+                            `C. briggsae Study Design` = './www/',
+                            `C. briggsae Log2CPM Gene Counts` = './www/',
+                            `C. briggsae vDGEList` = "./Data/",
+                            `C. brenneri Study Design` = './www/',
+                            `C. brenneri Log2CPM Gene Counts` = './www/',
+                            `C. brenneri vDGEList` = "./Data/",
+                            `C. japonica Study Design` = './www/',
+                            `C. japonica Log2CPM Gene Counts` = './www/',
+                            `C. japonica vDGEList` = "./Data/",
+                            `C. remanei Study Design` = './www/',
+                            `C. remanei Log2CPM Gene Counts` = './www/',
+                            `C. remanei vDGEList` = "./Data/" 
     )
     Info.file <- paste0(file.location, Info.type)
     Info.file
@@ -287,30 +262,21 @@ output$StudyInfo.panel.About <- renderUI({
         filename = function() {
             Info.file <- StudyInfo.filename.About()
             file.location <- switch(input$which.Experimental.Info.About,
-                                    `Ss Study Design` = './www/',
-                                    `Ss Log2CPM Gene Counts` = './www/',
-                                    `Ss vDGEList` = "./Data/",
-                                    `Ss Discarded Gene Counts` = "./www/",
-                                    `Cele Study Design` = './www/',
-                                    `Cele Log2CPM Gene Counts` = './www/',
-                                    `Cele vDGEList` = "./Data/",
-                                    `Cele Discarded Gene Counts` = "./www/",
-                                    `Cbri Study Design` = './www/',
-                                    `Cbri Log2CPM Gene Counts` = './www/',
-                                    `Cbri vDGEList` = "./Data/",
-                                    `Cbri Discarded Gene Counts` = "./www/",
-                                    `Cbre Study Design` = './www/',
-                                    `Cbre Log2CPM Gene Counts` = './www/',
-                                    `Cbre vDGEList` = "./Data/",
-                                    `Cbre Discarded Gene Counts` = "./www/",
-                                    `Cjap Study Design` = './www/',
-                                    `Cjap Log2CPM Gene Counts` = './www/',
-                                    `Cjap vDGEList` = "./Data/",
-                                    `Cjap Discarded Gene Counts` = "./www/",
-                                    `Crem Study Design` = './www/',
-                                    `Crem Log2CPM Gene Counts` = './www/',
-                                    `Crem vDGEList` = "./Data/",
-                                    `Crem Discarded Gene Counts` = "./www/"   
+                                    `C. elegans Study Design` = './www/',
+                                    `C. elegans Log2CPM Gene Counts` = './www/',
+                                    `C. elegans vDGEList` = "./Data/",
+                                    `C. briggsae Study Design` = './www/',
+                                    `C. briggsae Log2CPM Gene Counts` = './www/',
+                                    `C. briggsae vDGEList` = "./Data/",
+                                    `C. brenneri Study Design` = './www/',
+                                    `C. brenneri Log2CPM Gene Counts` = './www/',
+                                    `C. brenneri vDGEList` = "./Data/",
+                                    `C. japonica Study Design` = './www/',
+                                    `C. japonica Log2CPM Gene Counts` = './www/',
+                                    `C. japonica vDGEList` = "./Data/",
+                                    `C. remanei Study Design` = './www/',
+                                    `C. remanei Log2CPM Gene Counts` = './www/',
+                                    `C. remanei vDGEList` = "./Data/"   
             )
             str_remove(Info.file, file.location)
         },

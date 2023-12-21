@@ -123,39 +123,36 @@ tags$head(
     font-size: 15px;
     text-decoration: underline;
     font-weight: bold;
+    color: #772953;
     }
     
      #About_Updates h3 {
     font-size: 15px;
     text-decoration: underline;
     font-weight: bold;
+    color: #772953;
     }
     
-    #About_Preprocess h3 {
+    #About_Methods h3 {
     font-size: 15px;
     text-decoration: underline;
     font-weight: bold;
-    }
-    
-    #About_Data h3 {
-    font-size: 15px;
-    text-decoration: underline;
-    font-weight: bold;
-    }
-    
-    #About_Analysis_Methods h3 {
-    font-size: 15px;
-    text-decoration: underline;
-    font-weight: bold;
+    color: #772953;
     }
     
     .nav-pills li {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     }
     
     .nav-pills {
-    border-bottom: 1px solid #2C3E50;
+    border-bottom: 1px solid #e95420;
+    }
+    
+    .alert-success{
+    background-color: #EAC2D8;
+    border-color: #E0A4C5;
+    color: #772953;
     }
     
     #download_DGEdt_direction_LS .shiny-options-group{

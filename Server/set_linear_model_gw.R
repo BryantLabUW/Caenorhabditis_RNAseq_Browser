@@ -8,7 +8,7 @@ set_linear_model_GW <- eventReactive(input$goLifeStage_GW,{
                   vals$multipleCorrection_GW, 
                   vals$genelist, 
                   vals, vals$fit, 
-                  vals$v.DEGList.filtered.norm, 
+                  vals$v.DGEList.filtered.norm, 
                   adj.P.thresh, 
                   vals$diffGenes.df)
     

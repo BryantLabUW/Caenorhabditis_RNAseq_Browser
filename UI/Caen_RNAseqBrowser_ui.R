@@ -15,15 +15,17 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                         
                         ## Fluid Row 1: General usage notes to orient users ----
                         fluidRow(
-                            column(12,
+                            column(9,
                                    alert(status = "success",
                                          dismissible = TRUE,
                                          id = "userNotes_GW",
-                                         "Due to server constraints sessions run on shinyapps.io will time out after several minutes of inactivity If this happens, please reload the server connection.",
-                                           tags$br(),
-                                         "For more information and citation purposes, please see", 
-                                         tags$a("Bryant, DeMarco, and Hallem (2021)", href="https://academic.oup.com/g3journal/article/11/5/jkab104/6212650")
-                                         ))
+                                         "Due to server constraints sessions run on shinyapps.io will time out after several minutes of inactivity. If this happens, please reload the server connection."
+                                         )),
+                            column(3, 
+                                   alert(status = "info",
+                                         dismissible = TRUE,
+                                         id = "bugReport_GW", 
+                                         "To report a bug, please email Dr. Astra Bryant at astrab@uw.edu"))
                                    
                         ),
                         
@@ -39,8 +41,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                        id = "speciesPanelID_GW",
                                        selectInput("selectSpecies_GW",
                                                    label = h6("Pick a species"),
-                                                   choices = list("S. stercoralis",
-                                                                  "C. elegans",
+                                                   choices = list("C. elegans",
                                                                   "C. briggsae",
                                                                   "C. brenneri",
                                                                   "C. japonica",
@@ -60,8 +61,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                                                       NULL, 
                                                                       c("Study Design",
                                                                         "Log2CPM Gene Counts",
-                                                                        "vDGEList",
-                                                                        "Discarded Gene Counts"),
+                                                                        "vDGEList"),
                                                                       options = list(style = 'btn btn-default')),
                                                           uiOutput("StudyInfo.panel.GW")
                                                     )
@@ -178,15 +178,17 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                     useShinyjs(),
                     div(id = "LS",
                         fluidRow(
-                            column(12,
+                            column(9,
                                    alert(status = "success",
                                          dismissible = TRUE,
                                          id = "userNotes_LS",
-                                         "Due to server constraints sessions run on shinyapps.io will time out after several minutes of inactivity. If this happens, please reload the server connection.",
-                                         tags$br(),
-                                         "For more information and citation purposes, please see", 
-                                         tags$a("Bryant, DeMarco, and Hallem (2021)", href="https://academic.oup.com/g3journal/article/11/5/jkab104/6212650"),
-                                          ))
+                                         "Due to server constraints sessions run on shinyapps.io will time out after several minutes of inactivity. If this happens, please reload the server connection."
+                                          )),
+                            column(3, 
+                                   alert(status = "info",
+                                         dismissible = TRUE,
+                                         id = "bugReport_LS", 
+                                         "To report a bug, please email Dr. Astra Bryant at astrab@uw.edu"))
                         ),
                         
                         ## Fluid Row 2: Species Selection Panel + Life Stage Legend + Download Study Info Dropdown Menu ----
@@ -225,8 +227,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                                                       NULL, 
                                                                       c("Study Design",
                                                                         "Log2CPM Gene Counts",
-                                                                        "vDGEList",
-                                                                        "Discarded Gene Counts"),
+                                                                        "vDGEList"),
                                                                       options = list(style = 'btn btn-default')),
                                                           uiOutput("StudyInfo.panel.LS")
                                                     )
@@ -235,7 +236,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                         ),
                         
                         
-                        ## Fluid Row 3: Input Pairwise Comparisons Panel + Volcano Plot Panel + Contrasts Dropdown Menu ----    
+                        ## Fluid Row 3: Input Pairwise Comparisons Panel + Volcano Plot Panel + Contrasts Drop down Menu ----    
                         fluidRow(
                             column(3,
                                    
@@ -299,25 +300,6 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                    )
                             )
                             
-                        ),
-                        ## Fluid Row 5: Gene Set Enrichment Analysis Plot and Table Panels ----
-                        fluidRow(
-                            
-                            column(6,
-                                   conditionalPanel(condition = "output.pairwiseSelector_LS && input.goLS != 0 && output.volcano_LS",
-                                                    uiOutput("functional_LS")
-                                                    )
-                            ),
-                            column(6,
-                                   conditionalPanel(condition = "output.pairwiseSelector_LS && input.goLS != 0 && output.GSEAPlot_LS",
-                                                    panel(
-                                                        heading = tagList(h5(shiny::icon("fas fa-table"),
-                                                                             "Gene Set Enrichment Analysis: Data Table")),
-                                                        status = "primary",
-                                                        DTOutput('GSEATbl_LS'),
-                                                        uiOutput("downloadGSEAtbl_LS")
-                                                    ))
-                                   )
                         )
                     )
            ),
@@ -350,38 +332,20 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                     fluidRow(
                         column(8,
                                panel(heading =  tagList(h5(shiny::icon("fas fa-archive"),
-                                                           "RNA-seq Datasets")),
+                                                           "Pre-Processing and Analysis Methods")),
                                      status = "primary",
-                                     id = "About_Data",
+                                     id = "About_Methods",
                                      tabsetPanel(
-                                         type = "pills",
-                                         
-                                         tabPanel(
-                                             title = tags$em("S. stercoralis"),
-                                             includeMarkdown('UI/README/README_Data_Ss.md')
-                                         ),
-                                         tabPanel(
-                                             title = tags$em("C. elegans"),
-                                             includeMarkdown('UI/README/README_Data_Cele.md')
-                                         ),
-                                         tabPanel(
-                                             title = tags$em("C. briggsae"),
-                                             includeMarkdown('UI/README/README_Data_Cbri.md')
-                                         ),
-                                         tabPanel(
-                                             title = tags$em("C. brenneri"),
-                                             includeMarkdown('UI/README/README_Data_Cbre.md')
-                                         ),
-                                         tabPanel(
-                                           title = tags$em("C. japonica"),
-                                           includeMarkdown('UI/README/README_Data_Cjap.md')
-                                         ),
-                                         tabPanel(
-                                           title = tags$em("C. remanei"),
-                                           includeMarkdown('UI/README/README_Data_Crem.md')
-                                         )
-                                     )
-                                     
+                                       type = "pills",
+                                       
+                                       tabPanel(
+                                         title = tags$em("Pre-processing"),
+                                         includeMarkdown('UI/README/README_Preprocess.md')
+                                       ),
+                                       tabPanel(
+                                         title = tags$em("Analysis Methods"),
+                                         includeMarkdown('UI/README/README_Analysis_Methods.md')
+                                       ))
                                )
                                ),
                         column(4,
@@ -393,37 +357,27 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                        tags$ol(
                                            tags$li('Study design file (.csv)'),
                                            tags$li('Filtered, normalized log2CPM gene counts (.csv)'),
-                                           tags$li('Variance-stabilized Digital Gene Expression List (vDGEList; R object)'),
-                                           tags$li('Discarded gene counts (.csv)')
+                                           tags$li('Variance-stabilized Digital Gene Expression List (vDGEList; R object)')
                                        )),
                                      
                                      pickerInput("which.Experimental.Info.About",
                                                  NULL, 
                                                  choices = list(
-                                                     `S. stercoralis` = c("Ss Study Design",
-                                                                          "Ss Log2CPM Gene Counts",
-                                                                          "Ss vDGEList",
-                                                                          "Ss Discarded Gene Counts"),
-                                                     `C. elegans` = c("Cele Study Design",
-                                                                    "Cele Log2CPM Gene Counts",
-                                                                    "Cele vDGEList",
-                                                                    "Cele Discarded Gene Counts"),
-                                                     `C. briggsae` = c("Cbri Study Design",
-                                                                         "Cbri Log2CPM Gene Counts",
-                                                                         "Cbri vDGEList",
-                                                                         "Cbri Discarded Gene Counts"),
-                                                     `C. brenneri` = c("Cbre Study Design",
-                                                                            "Cbre Log2CPM Gene Counts",
-                                                                            "Cbre vDGEList",
-                                                                            "Cbre Discarded Gene Counts"),
-                                                     `C. japonica` = c("Cjap Study Design",
-                                                                      "Cjap Log2CPM Gene Counts",
-                                                                      "Cjap vDGEList",
-                                                                      "Cjap Discarded Gene Counts"),
-                                                     `C. remanei` = c("Crem Study Design",
-                                                                      "Crem Log2CPM Gene Counts",
-                                                                      "Crem vDGEList",
-                                                                      "Crem Discarded Gene Counts")
+                                                     `C. elegans` = c("C. elegans Study Design",
+                                                                    "C. elegans Log2CPM Gene Counts",
+                                                                    "C. elegans vDGEList"),
+                                                     `C. briggsae` = c("C. briggsae Study Design",
+                                                                         "C. briggsae Log2CPM Gene Counts",
+                                                                         "C. briggsae vDGEList"),
+                                                     `C. brenneri` = c("C. brenneri Study Design",
+                                                                            "C. brenneri Log2CPM Gene Counts",
+                                                                            "C. brenneri vDGEList"),
+                                                     `C. japonica` = c("C. japonica Study Design",
+                                                                      "C. japonica Log2CPM Gene Counts",
+                                                                      "C. japonica vDGEList"),
+                                                     `C. remanei` = c("C. remanei Study Design",
+                                                                      "C. remanei Log2CPM Gene Counts",
+                                                                      "C. remanei vDGEList")
                                                  ),
                                                  options = list(style = 'btn btn-primary',
                                                                 title = "Select a file to download")),
@@ -431,77 +385,19 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                      
                                )
                         )
-                        ),
-                       fluidRow(
-                           column(6,
-                               panel(heading =  tagList(h5(shiny::icon("fas fa-cogs"),
-                                                           "Data Pre-processing")),
-                                     status = "primary",
-                                     id = "About_Preprocess",
-                                     tabsetPanel(
-                                         type = "pills",
-                                         
-                                         tabPanel(
-                                             title = tags$em("S. stercoralis"),
-                                             includeMarkdown('UI/README/README_Preprocess_Ss.md')
-                                         ),
-                                         tabPanel(
-                                             title = tags$em("C. elegans"),
-                                             includeMarkdown('UI/README/README_Preprocess_Cele.md')
-                                         ),
-                                         tabPanel(
-                                             title = tags$em("C. briggsae"),
-                                             includeMarkdown('UI/README/README_Preprocess_Cbri.md')
-                                         ),
-                                         tabPanel(
-                                             title = tags$em("C. brenneri"),
-                                             includeMarkdown('UI/README/README_Preprocess_Cbre.md')
-                                         ),
-                                         tabPanel(
-                                           title = tags$em("C. japonica"),
-                                           includeMarkdown('UI/README/README_Preprocess_Cjap.md')
-                                         ),
-                                         tabPanel(
-                                           title = tags$em("C. remanei"),
-                                           includeMarkdown('UI/README/README_Preprocess_Crem.md')
-                                         )
-                                     )
-                                     
-                               )
-                               ),
-                           column(6,
-                               panel(heading =  tagList(h5(shiny::icon("fas fa-chart-line"),
-                                                           "Data Analysis Methods")),
-                                     status = "primary",
-                                     id = "About_Analysis_Methods",
-                                     includeMarkdown('UI/README/README_Analysis_Methods.md')
-                               )
                         )
-                        
-                    )
-                    
            ),
            
            # Tutorials Tab ----
            tabPanel(h4("Tutorials"),
                     value = "tutorials",
-                    fluidRow(
-                        column (12,
-                                alert(status = "success",
-                                      dismissible = TRUE,
-                                      id = "tutorial_alert",
-                                      "Additional tutorials coming soon!",
-                                      tags$br(),
-                                      "For more information regarding analysis methods and browser functionality, please see the About tab."
-                                )
-                        )
-                    ),
+                    
                     fluidRow(
                         column(12,
                                panel(
                                      status = "primary",
                                      id = "Tutorial_Workflow",
-                                     img(src='Tutorial_workflow.png', style = "width: 70vw; display: block; margin-left: auto; margin-right: auto")
+                                     img(src='Caen_Tutorial_workflow.png', style = "width: 70vw; display: block; margin-left: auto; margin-right: auto")
                                )
                         )
                     )

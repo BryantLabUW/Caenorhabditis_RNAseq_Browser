@@ -6,14 +6,14 @@ calc_DEG_tbl <- function (ebFit, coef) {
     myTopHits.df <- limma::topTable(ebFit, adjust ="BH", 
                                     coef=coef, number=40000, 
                                     sort.by="logFC") %>%
-        as_tibble(rownames = "geneID") %>%
+        as_tibble() %>%
         dplyr::rename(tStatistic = t, LogOdds = B, BH.adj.P.Val = adj.P.Val) %>%
-        dplyr::relocate(UniProtKB, Description, InterPro, GO_term,
-                        In.subclade_geneID, In.subclade_percent_homology,
-                        Out.subclade_geneID, Out.subclade_percent_homology,
-                        Out2.subclade_geneID, Out2.subclade_percent_homology,
-                        Ce_geneID, Ce_percent_homology, .after = LogOdds) %>%
-        dplyr::relocate(ends_with("WBgeneID"), .before = In.subclade_geneID)
+        dplyr::relocate(stableID, Description,
+                        GS1_homologID, GS1_percent_homology,
+                        GS2_homologID, GS2_percent_homology,
+                        GS3_homologID, GS3_percent_homology,
+                        GS4_homologID, GS4_percent_homology, .after = LogOdds) %>%
+        dplyr::relocate(ends_with("geneName"), .after = geneID)
     
     myTopHits.df
 }

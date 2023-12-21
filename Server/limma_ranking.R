@@ -2,11 +2,10 @@
 # Use Empirical Bayes Statistics to rank genes in order of evidence for differential expression
 # Adjust for Multiple Comparisons if necessary
 # This function is called by set_linear_model_gw.R and set_linear_model_ls.R
-limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrection, genelist, vals, fit, v.DEGList.filtered.norm, adj.P.thresh, diffGenes.df){
+limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrection, genelist, vals, fit, v.DGEList.filtered.norm, adj.P.thresh, diffGenes.df){
 
     contrast.matrix <- makeContrasts(contrasts = comparison,
-                                     levels = v.DEGList.filtered.norm$design)
-    
+                                     levels = v.DGEList.filtered.norm$design)
     fits <- contrasts.fit(fit, contrast.matrix)
     ebFit <- limma::eBayes(fits)
     setProgress(0.05)
@@ -30,6 +29,7 @@ limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrec
                   x == 0 ~ "NotSig")
     }
     results <- results %>%
+        as.data.frame(rownames = rownames(results)) %>%
         as_tibble(rownames = "geneID")
     
     diffDesc<-results %>%
@@ -47,16 +47,18 @@ limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrec
             vals$list.myTopHits.df[[y]] %>%
                 dplyr::filter(geneID %in% genelist[[1]]) %>%
                 dplyr::select(geneID, 
+                              geneName,
                               logFC, 
-                              BH.adj.P.Val:Ce_percent_homology)},
+                              BH.adj.P.Val:GS4_percent_homology)},
             simplify = FALSE, 
             USE.NAMES = TRUE)
     } else {
         list.highlight.df <- sapply(comparison, function(y){
             vals$list.myTopHits.df[[y]] %>%
                 dplyr::select(geneID, 
+                              geneName,
                               logFC, 
-                              BH.adj.P.Val:Ce_percent_homology)},
+                              BH.adj.P.Val:GS4_percent_homology)},
             simplify = FALSE, 
             USE.NAMES = TRUE)
     }
@@ -66,10 +68,12 @@ limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrec
         diffGenes.df <- diffGenes.df %>%
             dplyr::filter(geneID %in% genelist[[1]])
     } 
+
     setProgress(0.25)
     # Get log2CPM values and threshold information for genes of interest
     vals$list.highlight.tbl <- sapply(seq_along(comparison), function(y){
-        tS<- targetStage[y,][targetStage[y,]!=""]
+      
+      tS<- targetStage[y,][targetStage[y,]!=""]
         cS<- contrastStage[y,][contrastStage[y,]!=""]
         
         concat_name <- function(x) {
@@ -77,7 +81,6 @@ limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrec
                    paste(tS, collapse = "+"), 
                    paste(cS, collapse = "+"))
         }
-        
         groupAvgs <- diffGenes.df %>%
             dplyr::select(geneID, starts_with(paste0(tS,"-")), 
                           starts_with(paste0(cS,"-"))) %>%
@@ -109,8 +112,7 @@ limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrec
             left_join(dplyr::select(diffDesc,geneID,comparison[y]), by = "geneID") %>%
             dplyr::rename(DEG_Desc=comparison[y]) %>%
             dplyr::relocate(DEG_Desc) %>%
-            dplyr::relocate(logFC:Ce_percent_homology, .after = last_col())
-        
+            dplyr::relocate(logFC:GS4_percent_homology, .after = last_col())
     },
     simplify = FALSE)
     

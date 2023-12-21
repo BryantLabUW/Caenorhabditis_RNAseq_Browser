@@ -1,6 +1,6 @@
 generate_excel_report <- function(comparison, tbl,
                                   name = "RNA-seq Differential Gene Expression",
-                                  filename_prefix = "Stercoralis_RNAseq_Data_",
+                                  filename_prefix = "Caenorhabditis_RNAseq_Data_",
                                   subtitle_prefix = "Contrast:",
                                   expressionnotes = "",
                                   multiplecorrection = "",
