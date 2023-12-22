@@ -57,7 +57,6 @@ pull_DEGs_GW <- reactive({
              y = "BH-adjusted p-value",
              x = "log2FC") +
         theme_Publication() +
-      scale_color_manual(values = paletteer_d("rcartocolor::Prism")) +
         theme(aspect.ratio=1/3)
     setProgress(0.9)
     vplot
@@ -181,6 +180,9 @@ output$hover_info <- renderUI({
                       "<b> Gene Name: </b>",
                       point$geneName,
                       "<br/>",
+                      "<b> WormBaseID: </b>",
+                      point$WormBaseID,
+                      "<br/>",
                       "<b> Log FC: </b>",
                       round(point$logFC,digits = 2),
                       "<br/>",
@@ -210,7 +212,6 @@ assemble_DEGs_GW <- reactive({
     
     sample.num.tS <- sapply(tS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
     sample.num.cS <- sapply(cS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
-   
     n_num_cols <- sample.num.tS + sample.num.cS + 6
     index_homologs <- length(colnames(vals$list.highlight.tbl_GW[[vals$displayedComparison_GW]])) - 6
     
@@ -219,7 +220,7 @@ assemble_DEGs_GW <- reactive({
     highlight.datatable <- vals$list.highlight.tbl_GW[[vals$displayedComparison_GW]] %>%
         {suppressMessages(dplyr::full_join(.,excluded.genes))} %>%
       dplyr::mutate(WormBaseLink = paste0("<a href='https://wormbase.org/species/C_", species, "/gene/", geneID,"' target = '_blank'>", geneID,"</a>"))%>%
-      dplyr::relocate(stableID, Description,
+      dplyr::relocate(WormBaseID, Description, InterPro,
                       GS1_homologID, GS1_percent_homology,
                       GS2_homologID, GS2_percent_homology,
                       GS3_homologID, GS3_percent_homology,
@@ -269,7 +270,7 @@ assemble_DEGs_GW <- reactive({
                                            "}")
                                        ),
                                          list(
-                                             targets = n_num_cols + 4,
+                                             targets = c(n_num_cols + 5),
                                              render = JS(
                                                  "function(data, type, row, meta) {",
                                                  "return type === 'display' && data.length > 20 ?",

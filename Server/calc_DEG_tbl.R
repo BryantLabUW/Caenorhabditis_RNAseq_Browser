@@ -8,12 +8,12 @@ calc_DEG_tbl <- function (ebFit, coef) {
                                     sort.by="logFC") %>%
         as_tibble() %>%
         dplyr::rename(tStatistic = t, LogOdds = B, BH.adj.P.Val = adj.P.Val) %>%
-        dplyr::relocate(stableID, Description,
+        dplyr::relocate(WormBaseID, Description, InterPro,
                         GS1_homologID, GS1_percent_homology,
                         GS2_homologID, GS2_percent_homology,
                         GS3_homologID, GS3_percent_homology,
                         GS4_homologID, GS4_percent_homology, .after = LogOdds) %>%
         dplyr::relocate(ends_with("geneName"), .after = geneID)
-    
+
     myTopHits.df
 }

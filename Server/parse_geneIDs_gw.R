@@ -7,7 +7,7 @@ output$genePanelinputs <- renderUI({
             status = "primary",
             ### GeneID (text box)
             h5('Pick Genes', class = 'text-info', style = "margin: 0px 0px 5px 0px"),
-            p(tags$em('Users may type gene names, stable IDs, or keywords that will be matched against WormBase Gene Descriptions. Search terms may be separated using commas, semicolons, or new lines. Users may also upload a .csv file containing search terms.', style = "color: #7b8a8b")),
+            p(tags$em('Users may type gene names, stable IDs, or keywords that will be matched against WormBase and InterPro gene descriptions. Search terms may be separated using commas, semicolons, or new lines. Users may also upload a .csv file containing search terms.', style = "color: #7b8a8b")),
             p(tags$em("Type 'everything' or 'all genes' to display all genes in the genome. Warning: this will take a long time to process.", style = "color: #7b8a8b")),
             p(tags$em(tags$b('Note: Please hit the Clear button if switching between typing and uploading inputs.', style = "color: #bf9232"))),
             textAreaInput('idtext',
@@ -137,8 +137,8 @@ parse_ids <- eventReactive(input$goGW,{
             }) %>%
               rowSums() %>%
               as.logical()
-            
-            # Search WormBase Gene Description Terms
+
+           # Search WormBase Gene Description Terms
             geneindex.description<-sapply(terms.cleaned, function(y) {
                 incProgress(amount = inc)
                 grepl(gsub("^\\s+|\\s+$", "", y), #remove any number of whitespace from start or end
@@ -147,8 +147,28 @@ parse_ids <- eventReactive(input$goGW,{
             }) %>%
                 rowSums() %>%
                 as.logical()
+           
+             # Search InterPro Terms
+            geneindex.interpro<-sapply(terms.cleaned, function(y) {
+              incProgress(amount = inc)
+              grepl(gsub("^\\s+|\\s+$", "", y), #remove any number of whitespace from start or end
+                    vals$annotations$InterPro,
+                    ignore.case = TRUE)
+            }) %>%
+              rowSums() %>%
+              as.logical()
             
-            geneindex <- geneindex.geneID | geneindex.description |geneindex.GS1 | geneindex.GS2 | geneindex.GS3 | geneindex.GS4
+            # Search WormBaseID Terms
+            geneindex.wbid<-sapply(terms.cleaned, function(y) {
+              incProgress(amount = inc)
+              grepl(gsub("^\\s+|\\s+$", "", y), #remove any number of whitespace from start or end
+                    vals$annotations$WormBaseID,
+                    ignore.case = TRUE)
+            }) %>%
+              rowSums() %>%
+              as.logical()
+            
+            geneindex <- geneindex.geneID | geneindex.description | geneindex.wbid | geneindex.interpro | geneindex.GS1 | geneindex.GS2 | geneindex.GS3 | geneindex.GS4
             genelist <- dplyr::filter(genelist,geneindex) 
         }
        

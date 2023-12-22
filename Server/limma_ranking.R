@@ -35,7 +35,7 @@ limma_ranking <- function(comparison, targetStage, contrastStage, multipleCorrec
     diffDesc<-results %>%
         dplyr::mutate(across(-geneID, unclass)) %>%
         dplyr::mutate(across(where(is.double), recode01))
-    
+
     vals$list.myTopHits.df <- sapply(comparison, function(y){
         calc_DEG_tbl(ebFit, y)}, 
         simplify = FALSE, 

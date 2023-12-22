@@ -149,6 +149,9 @@ output$hover_info_LS <- renderUI({
                   "<b> Gene Name: </b>",
                   point$geneName,
                   "<br/>",
+                  "<b> WormBaseID: </b>",
+                  point$WormBaseID,
+                  "<br/>",
                   "<b> Log FC: </b>",
                   round(point$logFC,digits = 2),
                   "<br/>",
@@ -177,7 +180,7 @@ assemble_DEGs_LS <- reactive({
   
   LS.datatable <- vals$list.highlight.tbl_LS[[vals$displayedComparison_LS]] %>%
     dplyr::mutate(WormBaseLink = paste0("<a href='https://wormbase.org/species/C_", species, "/gene/", geneID,"' target = '_blank'>", geneID,"</a>"))%>%
-    dplyr::relocate(stableID, Description,
+    dplyr::relocate(WormBaseID, Description, InterPro,
                     GS1_homologID, GS1_percent_homology,
                     GS2_homologID, GS2_percent_homology,
                     GS3_homologID, GS3_percent_homology,
@@ -227,7 +230,7 @@ assemble_DEGs_LS <- reactive({
                                        "}")
                                    ),
                                    list(
-                                     targets = n_num_cols + 4,
+                                     targets = n_num_cols + 5,
                                      render = JS(
                                        "function(data, type, row, meta) {",
                                        "return type === 'display' && data.length > 20 ?",

@@ -28,7 +28,6 @@ suppressPackageStartupMessages({
     library(dendextend)
     library(vctrs)
     library(markdown)
-    library(paletteer)
     source("Server/ggheatmap_local.R")
     source("Server/calc_DEG_tbl.R")
     source("Server/theme_Publication.R")

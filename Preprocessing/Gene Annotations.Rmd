@@ -5,7 +5,7 @@ date: "2023-12-12"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -13,10 +13,29 @@ knitr::opts_chunk$set(echo = TRUE)
 The goal of this file is to import and clean gene annotation information for all genes from the following *Caenorhabditis*  species: *C. elegans*, *C. briggsae*, *C. remanei*, *C. japonica*, and *C. brenneri*.
 
 Annotation information includes:
-  * UniProtKB number
-  * Interpro terms
-  * GO terms
-  * general Description information using biomart.
+  * Gene name
+  * WormBase gene name/IDs
+  * WormBase description
+  * InterPro description
+  * Homologs/Percent homology with other *Caenorhabditis* species  
+
+```{r setup, echo = FALSE, results = FALSE, include = FALSE}
+if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+if (!require("tximport", quietly = TRUE)) BiocManager::install("tximport", ask = FALSE)
+if (!require("ensembldb", quietly = TRUE)) BiocManager::install("ensembldb", ask = FALSE)
+if (!require("biomaRt", quietly = TRUE)) BiocManager::install("biomaRt", ask = FALSE)
+if (!require("pacman", quietly = TRUE)) install.packages("pacman")
+pacman::p_load("tidyverse","data.table", "magrittr","ensembldb", "biomaRt", "knitr")
+
+# Check for presence of output folder, generate if it doesn't exist
+output.path <- "./Outputs"
+if (!dir.exists(output.path)){
+  dir.create(output.path)
+}
+
+app.path <-"../Data"
+www.path <-"../www"
+```
 
 ```{r geneAnnotation}
 # Introduction to this chunk -----------
@@ -32,6 +51,7 @@ for (x in species_list$species) {
 
 annotations <- getBM(attributes=c('wbps_gene_id', 
                                 'external_gene_id',
+                                'wormbase_gseq',
                                 'description',
                                 comparison.attributes$geneID[[1]],
                                 comparison.attributes$geneName[[1]],
@@ -52,24 +72,42 @@ annotations <- getBM(attributes=c('wbps_gene_id',
                                     host="https://parasite.wormbase.org", 
                                     port = 443),
                      filters = 'species_id_1010',
-                     useCache = F,
+                     useCache = T,
                      value = x) %>%
-  as_tibble(.name_repair = "unique")
-  #rename columns 
-  annotations <- annotations%>%
-  tidyr::unite("GS4_homologID", 14, 13, sep = " | ", remove = T) %>%
-  tidyr::unite("GS3_homologID", 11, 10, sep = " | ", remove = T) %>%
-  tidyr::unite("GS2_homologID", 8, 7, sep = " | ", remove = T) %>%
-  tidyr::unite("GS1_homologID", 5, 4, sep = " | ", remove = T) %>%
+  as_tibble(.name_repair = "unique") %>%
+  tidyr::unite("GS4_homologID", 15, 14, sep = " | ", remove = T) %>%
+  tidyr::unite("GS3_homologID", 12, 11, sep = " | ", remove = T) %>%
+  tidyr::unite("GS2_homologID", 9, 8, sep = " | ", remove = T) %>%
+  tidyr::unite("GS1_homologID", 6, 5, sep = " | ", remove = T) %>%
   dplyr::rename(geneID = "Gene stable ID",
                 geneName = "Gene name",
+                WormBaseID = "WormBase Sequence Name",
                 Description = "Gene description",
-                GS1_percent_homology = "% identity...6",
-                GS2_percent_homology = "% identity...9",
-                GS3_percent_homology = "% identity...12",
-                GS4_percent_homology = "% identity...15",
+                GS1_percent_homology = "% identity...7",
+                GS2_percent_homology = "% identity...10",
+                GS3_percent_homology = "% identity...13",
+                GS4_percent_homology = "% identity...16",
   ) %>%
   dplyr::group_by(geneID)
+
+# Gather then clean interpro description, removing duplications and collapsing to one line
+interpro_terms <- getBM(attributes=c('wbps_gene_id', 'interpro_description'),
+                     # grab the annotations from WormBase ParaSite
+                     mart = useMart(biomart="parasite_mart", 
+                                    dataset = "wbps_gene", 
+                                    host="https://parasite.wormbase.org", 
+                                    port = 443),
+                     filters = 'species_id_1010',
+                     useCache = T,
+                     value = x) %>%
+  dplyr::rename(geneID = "wbps_gene_id",
+                InterPro = "interpro_description") %>%
+  group_by(geneID) %>%
+  dplyr::distinct(InterPro, .keep_all = TRUE) %>%
+  dplyr::summarise(InterPro = paste(InterPro, collapse = ', '))
+
+annotations <-left_join(annotations, interpro_terms) %>%
+  relocate(InterPro, .after = Description)
 
 # Remove source code to shorten the description
 annotations$Description <- annotations$Description %>%
@@ -129,18 +167,28 @@ output.path <- "./Outputs"
 if (!dir.exists(output.path)){
   dir.create(output.path)
 }
-app.path <-"../Data"
 
-output.name <- paste0(x, '_geneAnnotations')
+species <- switch(x,
+                  `caelegprjna13758` = 'elegans',
+                  `cabrigprjna10731` = 'briggsae',
+                  `cabrenprjna20035` = 'brenneri',
+                  `cajapoprjna12591` = "japonica",
+                  `caremaprjna53967` = "remanei")
+
+app.path <-"../Data"
+output.name <- paste0(species, '_geneAnnotations')
+
 save(annotations,
      file = file.path(output.path,
                       output.name))
-}
 
 # Save in Shiny app Data folder
 save(annotations,
      file = file.path(app.path,
                       output.name))
+}
+
+
 
 
 ```
