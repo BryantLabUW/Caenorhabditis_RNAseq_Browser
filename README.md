@@ -15,7 +15,7 @@ This app is based on the *Strongyloides* RNA-seq Browser. For more information, 
 ## General Information
 This repository contains source code for the web-based *Caenorhabditis* RNA-seq Browser. This app is deployed via Shinyapps.io but can also be run locally. See App Setup and App Features sections below for additional details.  
 
-The sections below describe the contents of the primary subfolders within this repository:
+The sections below describe the contents of the primary sub-folders within this repository:
 
 ### Data  
 This folder contains pre-processed data files, including study design files, gene annotations, and digital gene expression lists (vDGEList) containing variance-stabilized, filtered, TMM-normalized RNA-seq data.
@@ -28,6 +28,9 @@ User interface files for the Shiny app. Includes custom css and additional READM
 
 ### www
 Static files that can be interactively downloaded within the *Caenorhabditis* RNA-seq Browser environment.
+
+### Preprocessing
+Contains pre-processing scripts used to generate the files used in the browser.
 
 ## App Setup & Deployment
 To access a stable deployment of the *Caenorhabditis* RNA-seq Browser Web App, please visit:   [hallemlab.shinyapps.io/strongyloides_rnaseq_browser/](https://hallemlab.shinyapps.io/Strongyloides_RNAseq_Browser/)  
