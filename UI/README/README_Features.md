@@ -29,4 +29,4 @@ for the app)
 
 To perform Gene Set Enrichment Analysis of differentially expressed genes, we recommend using one of the many tools already available, including:  
 - [WormBase Gene Set Enrichment Analysis app](https://wormbase.org//tools/enrichment/tea/tea.cgi)
-- [WormCat](http://www.wormcat.com/)[Holdorf *et al*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7017019/)
+- [WormCat](http://www.wormcat.com/) ([Holdorf *et al* 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7017019/))

@@ -1,6 +1,5 @@
 # Caenorhabditis_RNAseq_Browser 
-Web-based Shiny App for browsing and on-demand analysis of *Caenorhabditis* RNA-seq data from the modENCODE project ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/)).  
-[This app is deployed via Shinyapps.io](https://bryantlabuw.shinyapps.io/Caenorhabditis_RNAseq_Browser/)
+Web-based Shiny App for browsing and on-demand analysis of *Caenorhabditis* RNA-seq data originally published as part of the modENCODE project or by the Waterston Lab at the University of Washington ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/), [Gerstein *et al* 2014](https://www.nature.com/articles/nature13424), and [Warner *et al* 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  
 
 This app is based on the *Strongyloides* RNA-seq Browser. For more information, [please see the G3 paper associated with the original project](https://pubmed.ncbi.nlm.nih.gov/33823530/).
 
@@ -86,4 +85,6 @@ This project is licensed under the MIT License.
 
 ## Authors  
 * [Astra Bryant, PhD](https://github.com/astrasb)
+* Damia Akimori (Hallem Lab, UCLA)
+* LaDeana Hillier (Waterston Lab, UW)
 

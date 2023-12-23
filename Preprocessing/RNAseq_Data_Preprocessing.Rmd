@@ -1,6 +1,6 @@
 ---
 title: Pre-processing of *Caenorhabditis* spp. bulk RNA-seq for inclusion in *Caenorhabditis* RNA-Seq Browser
-author: "Astra S. Bryant, PhD"
+author: "Astra S. Bryant, PhD; Damia Akimori; LaDeana Hilllier"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: 
   html_document: 
@@ -14,13 +14,13 @@ output:
 ---
 
 # Introduction
-The goal of this file is to arrange gene-centric *Caenorhbaditis* RNA-seq data from the modENCODE project ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/), provided by LaDeana Hillier in Dr. Bob Waterson's lab at UW). 
+The goal of this file is to arrange gene-centric *Caenorhbaditis* RNA-seq data originally published as part of the modENCODE project or by the Waterston Lab at the University of Washington ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/), [Gerstein *et al* 2014](https://www.nature.com/articles/nature13424), and [Warner *et al* 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  
 
 ## Update Notes  
 
 
 # Pre-processing Methods Overview  
-Each genome and gff file were downloaded from WormBase.org version WS290. Reads were aligned to each genome using STAR (v2.7.6a, --alignIntronMax 30000 --alignMatesGapMax 30000) and the species-specific WS290 GTF file for each genome. PCR duplicates were removed using "seldup" ([Warner et al., 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  Read counts were obtained for each gene (CDS region only which is labeled as "CDS"  in *C. briggsae* and *C. elegans* and as "coding_exon" for *C. remanei*, *C. japonica*, and *C. brenneri*) using featureCounts (from the software package subread-2.0.6) using default settings. Only uniquely mapping reads were counted.  Additionally read counts were obtained for the CDS regions and for the full transcripts using the featureCount options -M --fraction so that multimappers were counted by splitting them equally among all of the locations where they aligned. 
+Each genome and gff file were downloaded from WormBase.org version WS290. Reads were aligned to each genome using STAR (v2.7.6a, --alignIntronMax 30000 --alignMatesGapMax 30000) and the species-specific WS290 GTF file for each genome. PCR duplicates were removed using "seldup" ([Warner et al., 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  Read counts were obtained for each gene (CDS region only which is labeled as "CDS"  in *C. briggsae* and *C. elegans* and as "coding_exon" for *C. remanei*, *C. japonica*, and *C. brenneri*) using featureCounts (from the software package subread-2.0.6) using default settings. Only uniquely mapping reads were counted.  Additionally read counts were obtained for the CDS regions and for the full transcripts using the featureCount options -M --fraction so that multimappers were counted by splitting them equally among all of the locations where they aligned. Alignment and counting was performed by LaDeana Hillier (Waterston Lab, UW). 
 
 Read data for each species was imported into R and annotated with information from WormBase ParaSite BiomaRT.
 
@@ -57,7 +57,7 @@ Note: Code chunks are collated and echoed at the end of the document in Appendix
 
 ## Import data into R and generate a Digital Gene Expression List 
 Generate a digital gene expression list that could be easily shared/loaded for downstream filtering/normalization.  
-```{r txImport, eval=T}
+```{r txImport, eval=F}
 species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica'))
 
 for (x in species_list$species) {
@@ -116,7 +116,7 @@ The goal of this chunk is to:
     iii)  the variance-stabilized vDGEList, saved as an R object (`_vDGEList`). 
     iv) a matrix of variance-stabilized gene expression data, extracted from the vDGEList (`_log2cpm_filtered_norm_voom.csv`) - this data is downloadable from within the Browser App.  
   
-```{r dataWrangling, eval=T, echo = TRUE}
+```{r dataWrangling, eval=F, echo = TRUE}
 species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica'))
 for (x in species_list$species) {
 # load pre-generated DGEList information

@@ -332,12 +332,15 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                     fluidRow(
                         column(8,
                                panel(heading =  tagList(h5(shiny::icon("fas fa-archive"),
-                                                           "Pre-Processing and Analysis Methods")),
+                                                           "Data, Pre-Processing, and Analysis Methods")),
                                      status = "primary",
                                      id = "About_Methods",
                                      tabsetPanel(
                                        type = "pills",
-                                       
+                                       tabPanel(
+                                         title = tags$em("Data"),
+                                         includeMarkdown('UI/README/README_Data.md')
+                                       ),
                                        tabPanel(
                                          title = tags$em("Pre-processing"),
                                          includeMarkdown('UI/README/README_Preprocess.md')
