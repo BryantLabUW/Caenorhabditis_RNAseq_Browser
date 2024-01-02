@@ -40,7 +40,7 @@ knitr::opts_chunk$set(
 if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 if (!require("tximport", quietly = TRUE)) BiocManager::install("tximport", ask = FALSE)
 if (!require("pacman", quietly = TRUE)) install.packages("pacman")
-pacman::p_load("tidyverse","data.table", "magrittr","edgeR","matrixStats","cowplot","ggthemes","gprofiler2","limma","tximport", "paletteer", "knitr")
+pacman::p_load("tidyverse","data.table", "magrittr","edgeR","matrixStats","cowplot","ggthemes","gprofiler2","limma","tximport", "knitr")
 
 # Check for presence of output folder, generate if it doesn't exist
 output.path <- "./Outputs"
@@ -58,7 +58,7 @@ Note: Code chunks are collated and echoed at the end of the document in Appendix
 ## Import data into R and generate a Digital Gene Expression List 
 Generate a digital gene expression list that could be easily shared/loaded for downstream filtering/normalization.  
 ```{r txImport, eval=F}
-species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica'))
+species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica', 'cele_embryonic'))
 
 for (x in species_list$species) {
 # read in the study design ----
@@ -71,6 +71,8 @@ load(paste0("./Outputs/",x,"_geneAnnotations"))
 # import featureCount output into R ----
 if (x == 'elegans' | x == 'briggsae') {
   path <- paste0("./Data/", x, "/featureCount.C_", x,".", targets$Biological_ID, ".CDS.unique_only.ws290.txt")
+} else if (x == 'cele_embryonic') {
+   path <- paste0("./Data/", x, "/featureCount.C_elegans.", targets$Biological_ID, ".CDS.unique_only.ws290.txt")
 } else {
   path <- paste0("./Data/", x, "/featureCount.C_", x,".", targets$Biological_ID, ".coding_exon.unique_only.ws290.txt")
 }
@@ -117,7 +119,7 @@ The goal of this chunk is to:
     iv) a matrix of variance-stabilized gene expression data, extracted from the vDGEList (`_log2cpm_filtered_norm_voom.csv`) - this data is downloadable from within the Browser App.  
   
 ```{r dataWrangling, eval=F, echo = TRUE}
-species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica'))
+species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica', 'cele_embryonic'))
 for (x in species_list$species) {
 # load pre-generated DGEList information
 load(paste0("./Outputs/",x,"_DGEList"))
@@ -159,7 +161,6 @@ p1 <- ggplot(log2.cpm.df.pivot) +
        subtitle="unfiltered, non-normalized",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
-  scale_fill_manual(values = paletteer_d("rcartocolor::Prism")) +
   coord_flip()
 # Filter the data ----
 
@@ -198,7 +199,6 @@ p2 <- ggplot(log2.cpm.filtered.df.pivot) +
        subtitle="filtered, non-normalized",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
-  scale_fill_manual(values = paletteer_d("rcartocolor::Prism")) +
   coord_flip()
 
 # Look at the genes excluded by the filtering step ----
@@ -232,9 +232,11 @@ discarded.gene.df <- log2.cpm.discarded.df.pivot %>%
   left_join(annotations, by = "geneID") 
 
 # Save a matrix of discarded genes and their raw counts ----
+output.name <- paste0(x, '_discardedGenes.csv')
+
 discarded.gene.df %>%    
 write.csv(file = file.path(output.path,
-                           "SsRNAseq_discardedGenes.csv"))
+                           output.name))
 
 # Plot discarded genes
 p.discarded <- ggplot(log2.cpm.discarded.df.pivot) +
@@ -251,7 +253,6 @@ p.discarded <- ggplot(log2.cpm.discarded.df.pivot) +
        subtitle="genes excluded by low count filtering step, non-normalized",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
-  scale_fill_manual(values = paletteer_d("rcartocolor::Prism")) +
   coord_flip()
   
 # Normalize the data using a between samples normalization ----
@@ -285,7 +286,6 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
        subtitle="filtered, TMM normalized",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
-  scale_fill_manual(values = paletteer_d("rcartocolor::Prism")) +
   coord_flip()
 
 output.name <- paste0(x, '_FilteringNormalizationGraphs')
@@ -594,6 +594,7 @@ DT::datatable(discarded.gene.df,
   DT::formatRound(columns=c(2:(ncol(discarded.gene.df)-10)), 
                         digits=3)
 ```
+
 
 
 # Appendix I : All code for this report  
