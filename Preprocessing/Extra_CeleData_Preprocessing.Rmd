@@ -590,8 +590,8 @@ summary(pca.res) # Prints variance summary for all principal components.
 #note that these have a magnitude and a direction (this is the basis for making a PCA plot)
 ## This generates a screeplot: a standard way to view eigenvalues for each PCA. Shows the proportion of variance accounted for by each PC. Plotting only the first 10 dimensions.
 p2<-fviz_eig(pca.res,
-             barcolor = brewer.pal(8,"Pastel2")[8],
-             barfill = brewer.pal(8,"Pastel2")[8],
+             #barcolor = brewer.pal(8,"Pastel2")[8],
+             #barfill = brewer.pal(8,"Pastel2")[8],
              linecolor = "black",
              main = "Scree plot: proportion of variance accounted for by each principal component", ggtheme = theme_bw()) 
 ```
