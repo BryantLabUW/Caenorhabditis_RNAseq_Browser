@@ -73,7 +73,7 @@ myDGEList <- DGEList(counts,
                      group = targets$group, 
                      genes = annotations_sub)
 
-output.name <- 'CeleEmbryonic_DGEList'
+output.name <- 'cele_embryonic_DGEList'
 save(myDGEList,
      file = file.path(output.path,
                       output.name))
@@ -143,14 +143,14 @@ colnames(v.DGEList.filtered.norm$E) <- paste(targets$block,targets$group,
 # Save matrix of genes and their filtered, normalized, voom-transformed counts ----
 # This is the count data that underlies the differential expression analyses in the Shiny app. 
 # Saving it here so that users of the app can access the input information.
-output.name <- 'CeleEmbryonic_log2cpm_filtered_norm_voom.csv'
+output.name <- 'cele_embryonic_log2cpm_filtered_norm_voom.csv'
 # Save in Shiny app download (www) folder
 write.csv(v.DGEList.filtered.norm$E, 
           file = file.path(www.path,
                            output.name))
 # Save v.DGEList ----
 # Save in Shiny app Data folder
-output.name <- 'CeleEmbryonic__vDGEList'
+output.name <- 'cele_embryonic__vDGEList'
 save(v.DGEList.filtered.norm,
      file = file.path(app.path,
                       output.name))
@@ -284,7 +284,7 @@ discarded.gene.df <- log2.cpm.discarded.df.pivot %>%
   left_join(annotations, by = "geneID") 
 
 # Save a matrix of discarded genes and their raw counts ----
-output.name <- 'CeleEmbryonic_discardedGenes.csv'
+output.name <- 'cele_embryonic_discardedGenes.csv'
 
 discarded.gene.df %>%    
 write.csv(file = file.path(output.path,
