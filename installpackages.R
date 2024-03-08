@@ -1,4 +1,4 @@
-## Install packages required for local instance of Strongyloides RNA-seq Browser
+## Install packages required for local instance of Caenorhabditis RNA-seq Browser
 # Note, if you're on a Windows computer, you may need to change the folder your R packages are stored in from Read-only.
 setRepositories(ind = c(1,2,3,4,5))
 if (!requireNamespace("pacman", quietly = TRUE))
@@ -24,4 +24,3 @@ pacman::p_load(shiny,shinyjs,shinyWidgets,htmltools,shinythemes,DT,Cairo,tidyver
 libPath <- .libPaths()
 remove.packages("patchwork", lib=libPath)
 devtools::install_github("thomasp85/patchwork")
-devtools::install_github("johannesbjork/LaCroixColoR")
