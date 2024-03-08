@@ -1,6 +1,7 @@
 ## GW: Generate Panel for Gene-wise Plots ----
 output$genePlotPanel_GW <- renderUI({
     parse_ids()
+    req(vals$genelist)
     isolate({
         tagList(div(id = "CPMPlotlydiv_parent",
                     panel(
@@ -20,11 +21,17 @@ output$genePlotPanel_GW <- renderUI({
 
 ## GW: Generate Responsive Selection for Gene to Display ----
 output$geneDisplaySelection_GW <- renderUI({
-    parse_ids()
+  parse_ids()
+  req(vals$genelist)
+  vals$genelist <- vals$genelist %>%
+    left_join(vals$annotations, by = "geneID") %>%
+    dplyr::mutate(geneReference = paste0(geneID, " | ", geneName)) %>%
+    dplyr::select(geneID, geneReference)
+  
     if (length(vals$genelist$geneID)>1) {
-        choices <- c("All Genes", "Data Table",vals$genelist$geneID)
+        choices <- c("All Genes", "Data Table",vals$genelist$geneReference)
     } else {
-        choices <- c(vals$genelist$geneID,"Data Table")}
+        choices <- c(vals$genelist$geneReference,"Data Table")}
     tagList(div(id = "geneDisplaySelectionPanel",
                 panel(
                     heading = tagList(h5(shiny::icon("fas fa-filter"),

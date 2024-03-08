@@ -4,28 +4,33 @@ species <- switch(input$selectSpecies_GW,
                   `C. briggsae` = 'briggsae',
                   `C. brenneri` = 'brenneri',
                   `C. japonica` = "japonica",
-                  `C. remanei` = "remanei")
+                  `C. remanei` = "remanei", 
+                  `C. elegans Embryonic Timeline` = "cele_embryonic")
 species.GS1 <- switch(species,
                       'elegans' = 'briggsae',
                       'briggsae' = 'elegans',
                       'brenneri' = 'elegans',
                       'japonica' = 'elegans',
-                      'remanei' = 'elegans')
+                      'remanei' = 'elegans', 
+                      'cele_embryonic' = 'elegans')
 species.GS2 <- switch(species,
                       'elegans' = 'brenneri',
                       'briggsae' = 'brenneri',
                       'brenneri' = 'briggsae',
                       'japonica' = 'briggsae',
-                      'remanei' = 'briggsae')
+                      'remanei' = 'briggsae', 
+                      'cele_embryonic' = 'briggsae')
 species.GS3 <- switch(species,
                       'elegans' = 'remanei',
                       'briggsae' = 'remanei',
                       'brenneri' = 'remanei',
                       'japonica' = 'remanei',
-                      'remanei' = 'japonica')
-species.GS4 <- switch(species,
+                      'remanei' = 'japonica', 
+                      'cele_embryonic' ='brenneri')
+species.GS4<- switch(species,
                       'elegans' = 'japonica',
                       'briggsae' = 'japonica',
                       'brenneri' = 'japonica',
                       'japonica' = 'brenneri',
-                      'remanei' = 'brenneri')
+                      'remanei' = 'brenneri', 
+                      'cele_embryonic' = 'remanei')

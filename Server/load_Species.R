@@ -20,7 +20,8 @@ observeEvent(input$speciesGW, {
                       `C. briggsae` = 'briggsae',
                       `C. brenneri` = 'brenneri',
                       `C. japonica` = "japonica",
-                      `C. remanei` = "remanei")
+                      `C. remanei` = "remanei",
+                      `C. elegans Embryonic` = 'cele_embryonic')
 
     
     withProgress({
@@ -74,7 +75,8 @@ StudyInfo.filename.GW <- reactive({
                       `C. briggsae` = 'briggsae',
                       `C. brenneri` = 'brenneri',
                       `C. japonica` = "japonica",
-                      `C. remanei` = "remanei")
+                      `C. remanei` = "remanei",
+                      `C. elegans embryonic` = "cele_embryonic")
     
     Info.type <- switch(input$which.Experimental.Info.GW,
                         `Study Design` = '_study_design.txt',
@@ -127,7 +129,8 @@ observeEvent(input$speciesLS, {
                       `C. briggsae` = 'briggsae',
                       `C. brenneri` = 'brenneri',
                       `C. japonica` = "japonica",
-                      `C. remanei` = "remanei")
+                      `C. remanei` = "remanei",
+                      `C. elegans embryonic` = "cele_embryonic")
     
     withProgress({
         # Import a variance-stabilized DGEList created by voom transformation command.
@@ -176,7 +179,8 @@ StudyInfo.filename.LS <- reactive({
                       `C. briggsae` = 'briggsae',
                       `C. brenneri` = 'brenneri',
                       `C. japonica` = "japonica",
-                      `C. remanei` = "remanei")
+                      `C. remanei` = "remanei",
+                      `C. elegans embryonic` = "cele_embryonic")
     
     Info.type <- switch(input$which.Experimental.Info.LS,
                         `Study Design` = '_study_design.txt',
@@ -231,7 +235,10 @@ StudyInfo.filename.About <- reactive({
                         `C. japonica vDGEList` = "japonica_vDGEList",
                         `C. remanei Study Design` = 'remanei_study_design.txt',
                         `C. remanei Log2CPM Gene Counts` = 'remanei_log2cpm_filtered_norm_voom.csv',
-                        `C. remanei vDGEList` = "remanei_vDGEList"
+                        `C. remanei vDGEList` = "remanei_vDGEList",
+                        `C. elegans Embryonic Study Design` = 'cele_embryonic_study_design.txt',
+                        `C. elegans Embryonic Log2CPM Gene Counts` = 'cele_embryonic_log2cpm_filtered_norm_voom.csv',
+                        `C. elegans Embryonic vDGEList` = "cele_embryonic_vDGEList"
                         )
                         
     
@@ -250,7 +257,10 @@ StudyInfo.filename.About <- reactive({
                             `C. japonica vDGEList` = "./Data/",
                             `C. remanei Study Design` = './www/',
                             `C. remanei Log2CPM Gene Counts` = './www/',
-                            `C. remanei vDGEList` = "./Data/" 
+                            `C. remanei vDGEList` = "./Data/",
+                            `C. elegans Embryonic Study Design` = './www/',
+                            `C. elegans Embryonic Log2CPM Gene Counts` = './www/',
+                            `C. elegans Embryonic vDGEList` = "./Data/"
     )
     Info.file <- paste0(file.location, Info.type)
     Info.file
@@ -276,7 +286,10 @@ output$StudyInfo.panel.About <- renderUI({
                                     `C. japonica vDGEList` = "./Data/",
                                     `C. remanei Study Design` = './www/',
                                     `C. remanei Log2CPM Gene Counts` = './www/',
-                                    `C. remanei vDGEList` = "./Data/"   
+                                    `C. remanei vDGEList` = "./Data/",
+                                    `C. elegans Embryonic Study Design` = './www/',
+                                    `C. elegans Embryonic Log2CPM Gene Counts` = './www/',
+                                    `C. elegans Embryonic vDGEList` = "./Data/"   
             )
             str_remove(Info.file, file.location)
         },

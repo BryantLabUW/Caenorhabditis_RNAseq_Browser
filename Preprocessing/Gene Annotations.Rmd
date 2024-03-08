@@ -186,6 +186,26 @@ save(annotations,
 save(annotations,
      file = file.path(app.path,
                       output.name))
+
+if (x == "caelegprjna13758"){
+  annotations <- annotations %>%
+    unite(GS1_homologID, geneName, geneID, sep =" | ", remove = F) %>%
+    dplyr::mutate(GS4_homologID = GS3_homologID,
+                  GS3_homologID = GS2_homologID,
+                  GS2_homologID = GS1_homologID, GS4_percent_homology = GS3_percent_homology,
+                  GS3_percent_homology = GS2_percent_homology,
+                  GS2_percent_homology = GS1_percent_homology,
+                  GS1_percent_homology = NA) %>%
+    relocate(GS1_homologID, .after = InterPro)
+}
+
+save(annotations,
+     file = file.path(output.path,
+                      'cele_embryonic_geneAnnotations'))
+# Save in Shiny app Data folder
+save(annotations,
+     file = file.path(app.path,
+                      'cele_embryonic_geneAnnotations'))
 }
 
 ```

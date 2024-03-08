@@ -203,7 +203,6 @@ parse_ids <- eventReactive(input$goGW,{
         vals$genelist <- genelist
         vals$genelist.Log2CPM <- vals$Log2CPM %>%
             dplyr::filter(geneID %in% genelist$geneID)
-        
         },message = "Parsing gene IDs...")
     })
 })

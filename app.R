@@ -21,8 +21,6 @@ suppressPackageStartupMessages({
     library(svglite)
     library(Cairo)
     library(heatmaply)
-    library(RColorBrewer)
-    library(rcartocolor)
     library(openxlsx)
     library(egg)
     library(dendextend)
@@ -98,10 +96,8 @@ server <- function(input, output, session) {
     ## GW: Generate Responsive Selection for Life Stage to Display
     source('Server/initialize_pairwiseComparisons_gw.R', local = T)
     
-    
     ## GW: Set Contrast Matrix, Fit the Linear Model, Extract the Differentially Expressed Genes
     source('Server/set_linear_model_gw.R', local = T)
-    
     
     ## GW: Assemble the Volcano Plot 
     ## GW: Volcano Plot, Generate UI

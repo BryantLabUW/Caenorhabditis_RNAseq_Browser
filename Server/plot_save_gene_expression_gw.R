@@ -97,12 +97,15 @@ generateHeatmapTable <- reactive({
       as.matrix()
     rownames(diffGenes) <- rownames(vals$v.DGEList.filtered.norm$E)
     subset.diffGenes<- diffGenes[vals$gene_of_interest,]
-    
+
+    renaming.rows <- vals$v.DGEList.filtered.norm$genes[rownames(subset.diffGenes),c("geneID", "geneName")]
+    rownames(subset.diffGenes) <- paste0(renaming.rows$geneID, " | ", renaming.rows$geneName)
+
     setProgress(0.2)
     clustColumns <- hclust(as.dist(1-cor(subset.diffGenes, method="spearman")), method="complete")
     
     colnames(subset.diffGenes) <- paste0(vals$v.DGEList.filtered.norm$targets$group,
-                                         "...",
+                                         ".",
                                          substr(vals$v.DGEList.filtered.norm$targets$samples, 
                                                 nchar(
                                                   as.character(vals$v.DGEList.filtered.norm$targets$samples[1]))-2, nchar(
@@ -160,8 +163,12 @@ generateGenePlot <- reactive({
   req(vals$genelist.Log2CPM, vals$genelist)
   vals$gene_of_interest <- input$displayedGene
   setProgress(0.25)
+  
   #Plot Log2CPM values for an individual gene
   gene_vals <- vals$genelist.Log2CPM %>%
+    left_join(vals$annotations, by = "geneID") %>%
+    dplyr::select(geneID, life_stage, log2CPM, geneName) %>%
+    dplyr::mutate(geneID = paste0(geneID, " | ", geneName)) %>%
     dplyr::filter(geneID == vals$gene_of_interest)
   setProgress(0.5)
   
@@ -178,14 +185,25 @@ generateGenePlot <- reactive({
                                        stroke = .75,
                                        show.legend = F,
                                        aes(color = life_stage)) +
-                           scale_fill_carto_d(palette = "Prism") + 
-                           scale_color_carto_d(palette = "Prism") +
                            labs(y="log2 CPM expression", x = "Life Stage",
                                 title= "Log2 Counts per Million (CPM) Expression",
                                 subtitle=paste("Selected gene:",
-                                               vals$gene_of_interest)) +
+                                               gene_vals$geneID[1])) +
                            theme_Publication() + 
-                           theme(aspect.ratio=2/3))
+                           theme(aspect.ratio=2/4))
+  
+  # Identify the identity of the primary species
+  source('Server/switch_species.R', local = T)
+
+  if (species == 'cele_embryonic') {
+    p <- p +
+      labs(x = "Time point") +
+      theme(axis.text.x = element_text(
+              angle = 45,
+              hjust = 1),
+            aspect.ratio=2/5)
+  } 
+  
   vals$gene_plot <- p
   p
 })
@@ -211,7 +229,7 @@ fetch_homologs <- reactive({
     separate_wider_delim(GS1_homologID:GS4_homologID, " | ", names = c(NA, ""),names_sep = "")
   
   vals$homologous_genes <- genelist.allspecies
-  
+ 
   # Identify the identity of the primary species, and the homologous species
   source('Server/switch_species.R', local = T)
   
@@ -263,8 +281,7 @@ fetch_homologs <- reactive({
     group_by(geneID, life_stage) %>%
     dplyr::filter(grepl(genelist.allspecies$GS4_homologID[1], geneID))
   remove(v.DGEList.filtered.norm)
-  
-  
+
   life_stage_types <- lifestage_legend %>%
     dplyr::select(-group) %>%
     colnames()
@@ -297,8 +314,11 @@ output$CPM.homologs <- renderPlot({
   req(input$displayedGene != "Data Table")
   withProgress({
     plot.tbl <- fetch_homologs()
+    
+    gene_lookup <- dplyr::filter(vals$genelist, 
+                                 geneReference %in% input$displayedGene)
     set_displayed <- dplyr::filter(vals$homologous_genes, 
-                                   geneID %in% input$displayedGene)%>%
+                                   geneID %in% gene_lookup$geneID)%>%
       as.character()
     
     plot.tbl <- plot.tbl %>%
@@ -321,21 +341,19 @@ output$CPM.homologs <- renderPlot({
                                        stroke = .75,
                                        show.legend = F,
                                        aes(color = life_stage)) +
-                           #scale_fill_carto_d(palette = "Vivid") + 
-                           #scale_color_carto_d(palette = "Vivid") +
                            labs(y="log2 CPM expression", x = "Life Stage",
                                 title= "Expression of Homologous Genes Across Species",
                                 subtitle=paste("Selected gene:",
                                                vals$gene_of_interest)) +
-                           facet_wrap(~id + geneID, 
-                                      nrow = 1,
-                                      scales = "free_x") +
+                           facet_grid(~id + geneID, 
+                                      scales = "free_x",
+                                      space = "free_x") +
                            theme_Publication() + 
-                           theme(aspect.ratio=2/3,
-                                 axis.text.x = element_text(
+                           theme(axis.text.x = element_text(
                                    angle = 45,
                                    hjust = 1))
     )
+   
     vals$homolog_plot <- p
     p
   }, message = "Loading Homolog Plot")
