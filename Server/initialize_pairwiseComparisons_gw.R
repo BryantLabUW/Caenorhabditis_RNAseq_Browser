@@ -40,7 +40,7 @@ output$pairwiseSelector_GW<- renderUI({
             
             tags$hr(style="border-color: #2C3E50;"),
             h5('B: Multiple Comparisons', class = 'text-info'),
-            p(tags$em('If using the textbox to type comma-separated contrasts, please use the format: (Target)-(Contrast). For example typing "Dauer-YA, (L1+L2)-(YA+YA_male)" will run two pairwise comparisons: Dauer vs YA and L1+L2 vs YA+YA_male. To correct for multiple, closely related pairwise comparisons, use the toggle switch below.', style = "color: #7b8a8b")),
+            p(tags$em('If using the textbox to type comma-separated contrasts, please use the format: (Target)-(Contrast). For example typing "Dauer-YA, (L1+L2)-(YA)" will run two pairwise comparisons: Dauer vs YA and L1+L2 vs YA. To correct for multiple, closely related pairwise comparisons, use the toggle switch below.', style = "color: #7b8a8b")),
             # Text Input for Multiple Contrasts
             textAreaInput('multiContrasts_GW',
                           NULL,

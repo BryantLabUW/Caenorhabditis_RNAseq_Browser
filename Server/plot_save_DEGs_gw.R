@@ -35,15 +35,15 @@ pull_DEGs_GW <- reactive({
         geom_hline(yintercept = -log10(adj.P.thresh), 
                    linetype="longdash", 
                    colour="black", 
-                   size=1) + 
+                   linewidth=1) + 
         geom_vline(xintercept = lfc.thresh, 
                    linetype="longdash", 
                    colour="#BE684D", 
-                   size=1) +
+                   linewidth=1) +
         geom_vline(xintercept = -lfc.thresh, 
                    linetype="longdash", 
                    colour="#2C467A", 
-                   size=1) + {
+                   linewidth=1) + {
                        if (vals$scaletogenome == TRUE) expand_limits(x = c(min(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$logFC), max(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$logFC)), y = c(min(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$BH.adj.P.Val), max(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$BH.adj.P.Val))) } +
         guides(size = "none",
                colour = point_labels)+

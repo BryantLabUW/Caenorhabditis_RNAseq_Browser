@@ -12,12 +12,10 @@ output:
     toc_float: true
     number_sections: true
 ---
-
 # Introduction
 The goal of this file is to arrange gene-centric *Caenorhbaditis* RNA-seq data originally published as part of the modENCODE project or by the Waterston Lab at the University of Washington ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/), [Gerstein *et al* 2014](https://www.nature.com/articles/nature13424), and [Warner *et al* 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  
 
 ## Update Notes  
-
 
 # Pre-processing Methods Overview  
 Each genome and gff file were downloaded from WormBase.org version WS290. Reads were aligned to each genome using STAR (v2.7.6a, --alignIntronMax 30000 --alignMatesGapMax 30000) and the species-specific WS290 GTF file for each genome. PCR duplicates were removed using "seldup" ([Warner et al., 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  Read counts were obtained for each gene (CDS region only which is labeled as "CDS"  in *C. briggsae* and *C. elegans* and as "coding_exon" for *C. remanei*, *C. japonica*, and *C. brenneri*) using featureCounts (from the software package subread-2.0.6) using default settings. Only uniquely mapping reads were counted.  Additionally read counts were obtained for the CDS regions and for the full transcripts using the featureCount options -M --fraction so that multimappers were counted by splitting them equally among all of the locations where they aligned. Alignment and counting was performed by LaDeana Hillier (Waterston Lab, UW). 
@@ -40,7 +38,7 @@ knitr::opts_chunk$set(
 if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 if (!require("tximport", quietly = TRUE)) BiocManager::install("tximport", ask = FALSE)
 if (!require("pacman", quietly = TRUE)) install.packages("pacman")
-pacman::p_load("tidyverse","data.table", "magrittr","edgeR","matrixStats","cowplot","ggthemes","gprofiler2","limma","tximport", "knitr")
+pacman::p_load("tidyverse","data.table", "magrittr","edgeR","matrixStats","cowplot","ggthemes","gprofiler2","limma","tximport", "knitr", "ggforce", "ggdendro", "factoextra", "gridExtra", "dendextend")
 
 # Check for presence of output folder, generate if it doesn't exist
 output.path <- "./Outputs"
@@ -57,9 +55,9 @@ Note: Code chunks are collated and echoed at the end of the document in Appendix
 
 ## Import data into R and generate a Digital Gene Expression List 
 Generate a digital gene expression list that could be easily shared/loaded for downstream filtering/normalization.  
-```{r txImport, eval=F}
+```{r txImport, eval=T}
 species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica', 'cele_embryonic'))
-
+species_list <- tibble(species = c('cele_embryonic'))
 for (x in species_list$species) {
 # read in the study design ----
 targets <- read_tsv(paste0("./Data/", x, "/", x,"_study_design.txt"),
@@ -79,10 +77,10 @@ if (x == 'elegans' | x == 'briggsae') {
 
 featureCountData<- rbindlist(lapply(path, fread), idcol="sample") %>%
 mutate(sample = targets$sample[sample])
-colnames(featureCountData)<-c('sample','geneID', 'Ce_ortholog', 'stableID', "location", "length", "count")
+colnames(featureCountData)<-c('sample','geneID', 'geneName', 'stableID', "location", "length", "count")
 
 featureCountData_wider <- featureCountData %>%
-  dplyr::select(!c(Ce_ortholog, location, length)) %>%
+  dplyr::select(!c(location, length)) %>%
   pivot_wider(names_from = sample, values_from = count)
 
 counts <- featureCountData_wider %>%
@@ -106,19 +104,20 @@ save(myDGEList,
 ```
 
 
-## Data Filtering, Normalization, and Variance Stabilization
+## Data Filtering, Normalization, Variance Stabilization, and Multivariate Analysis
 The goal of this chunk is to:
 
   1. Filter and normalize data. 
-  2. Use `ggplot2` to visualize the impact of filtering and normalization on the data (see Output section, below). 
-  3. ses a DGEList of filtered and normalized abundance data. It will fit data to a linear model for responsively detecting differentially expressed genes (DGEs).  
+  2. Use `ggplot2` to visualize the impact of filtering and normalization on the data. 
+  3. Fit data to a linear model for responsively detecting differentially expressed genes (DGEs). 
+  4. Implement hierarchical clustering and PCA analyses, plotting a dendrogram of the hierarchical clustering, a PCA plot for the first two principle components, and a PCA small multiple plot.
   4. Save the following files and datasets:   
     i) filtered and normalized (but not voom adjusted) log2CPM values.  
     ii) a matrix of discarded genes and their raw counts - this data is downloadable from within the Shiny Browser App. 
     iii)  the variance-stabilized vDGEList, saved as an R object (`_vDGEList`). 
     iv) a matrix of variance-stabilized gene expression data, extracted from the vDGEList (`_log2cpm_filtered_norm_voom.csv`) - this data is downloadable from within the Browser App.  
   
-```{r dataWrangling, eval=F, echo = TRUE}
+```{r dataWrangling, eval=T, echo = TRUE}
 species_list <- tibble(species = c('elegans', 'briggsae', 'brenneri', 'remanei', 'japonica', 'cele_embryonic'))
 for (x in species_list$species) {
 # load pre-generated DGEList information
@@ -159,9 +158,16 @@ p1 <- ggplot(log2.cpm.df.pivot) +
   labs(y="log2 expression", x = "sample",
        title = paste0("C. ", x, ": Log2 Counts per Million (CPM)"),
        subtitle="unfiltered, non-normalized",
+       fill= "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
   coord_flip()
+
+if (x == 'cele_embryonic') {
+  p1 <- p1 +
+    labs(fill = "Time point") +
+    theme(axis.text.y = element_text (size = 5))
+} 
 # Filter the data ----
 
 # filter genes/transcripts with low counts
@@ -197,9 +203,16 @@ p2 <- ggplot(log2.cpm.filtered.df.pivot) +
   labs(y="log2 expression", x = "sample",
        title = paste0("C. ", x, ": Log2 Counts per Million (CPM)"),
        subtitle="filtered, non-normalized",
+       fill = "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
   coord_flip()
+
+if (x == 'cele_embryonic') {
+  p2 <- p2 +
+    labs(fill = "Time point") +
+    theme(axis.text.y = element_text (size = 5))
+} 
 
 # Look at the genes excluded by the filtering step ----
 # just to check that there aren't any with 
@@ -251,9 +264,19 @@ p.discarded <- ggplot(log2.cpm.discarded.df.pivot) +
   labs(y="expression", x = "sample",
        title = paste0("C. ", x, ": Counts per Million (CPM)"),
        subtitle="genes excluded by low count filtering step, non-normalized",
+       fill = "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
+  theme(text = element_text(size = 10),
+        title = element_text(size = 10),
+        axis.text.y = element_text (size = 5)) +
   coord_flip()
+
+if (x == 'cele_embryonic') {
+  p.discarded <- p.discarded +
+    labs(fill = "Time point") +
+    theme(axis.text.y = element_text (size = 5))
+} 
   
 # Normalize the data using a between samples normalization ----
 # Source for TMM sample normalization here:
@@ -284,31 +307,34 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
   labs(y="log2 expression", x = "sample",
        title = paste0("C. ", x, ": Log2 Counts per Million (CPM)"),
        subtitle="filtered, TMM normalized",
+       fill = "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
+  theme(text = element_text(size = 10),
+        title = element_text(size = 10),
+        axis.text.y = element_text (size = 5)) +
   coord_flip()
 
-output.name <- paste0(x, '_FilteringNormalizationGraphs')
-save(p1, p2, p3, p.discarded, discarded.gene.df,
-     file = file.path(output.path,
-                      output.name))
-
-output.name <- paste0(x, '_DGEList_filtered_normalized')
-save(myDGEList.filtered.norm,
-     file = file.path(output.path,
-                      output.name))
-
+if (x == 'cele_embryonic') {
+  p3 <- p3 +
+    labs(fill = "Time point") +
+    theme(axis.text.y = element_text (size = 5))
+} 
 
 # Compute Variance-Stabilized DGEList Object ----
 
 # Set up the design matrix ----
-# no intercept/blocking for matrix, comparisons across group
-group <- factor(targets$group)
-design <- model.matrix(~0 + group) 
-colnames(design) <- levels(group)
+# for C. elegans embryonic timeline, use a blocking design to account for batch effects
+if (x == 'cele_embryonic') {
+  group <- factor(targets$group)
+  block <- factor(targets$block) #do blocking by polya+ and wholeRNA (by sample date)
+  design <- model.matrix(~block + group)
 
-# NOTE: To handle a 'blocking' design' or a batch effect, use:
-# design <- model.matrix(~block + treatment)
+} else{
+# no intercept/blocking for matrix, comparisons across group
+  group <- factor(targets$group)
+  design <- model.matrix(~0 + group) 
+  colnames(design) <- levels(group)}
 
 # Model mean-variance trend and fit linear model to data ----
 # Use VOOM function from Limma package to model the mean-variance relationship
@@ -319,9 +345,184 @@ colnames(design) <- levels(group)
 v.DGEList.filtered.norm <- voom(counts = myDGEList.filtered.norm, 
                                 design = design, plot = T)
 colnames(v.DGEList.filtered.norm)<-targets$sample
-colnames(v.DGEList.filtered.norm$E) <- paste(targets$group, 
+if (x == 'cele_embryonic') {
+  colnames(v.DGEList.filtered.norm$E) <- paste(targets$block,targets$group, 
                                              targets$sample,sep = '-')
+}else {
+  colnames(v.DGEList.filtered.norm$E) <- paste(targets$group, 
+                                             targets$sample,sep = '-')}
 
+
+# Perform multivariate analysis on the data
+# Identify variables of interest in study design file ----
+group <- factor(targets$group)
+
+# Hierarchical clustering ---------------
+# Remember: hierarchical clustering can only work on a data matrix, not a data frame
+
+# Calculate distance matrix
+# dist calculates distance between rows, so transpose data so that we get distance between samples.
+# how similar are samples from each other
+colnames(log2.cpm.filtered.norm)<- targets$group
+distance <- dist(t(log2.cpm.filtered.norm), method = "maximum") #other distance methods are "euclidean", maximum", "manhattan", "canberra", "binary" or "minkowski"
+
+# Calculate clusters to visualize differences. This is the hierarchical clustering.
+# The methods here include: single (i.e. "friends-of-friends"), complete (i.e. complete linkage), and average (i.e. UPGMA). Here's a comparison of different types: https://en.wikipedia.org/wiki/UPGMA#Comparison_with_other_linkages
+clusters <- hclust(distance, method = "complete") #other agglomeration methods are "ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", or "centroid"
+dend <- as.dendrogram(clusters) 
+
+p4<-dend %>% 
+  #dendextend::set("branches_k_color", k = 5) %>% 
+  dendextend::set("hang_leaves", c(0.1)) %>% 
+  dendextend::set("labels_cex", c(0.5)) %>%
+  #dendextend::set("labels_colors", k = 5) %>% 
+  dendextend::set("branches_lwd", c(0.7)) %>% 
+  as.ggdend %>%
+  ggplot (offset_labels = -0.5) +
+  theme_dendro() +
+  ylim(-8, max(get_branches_heights(dend))) +
+  labs(title = "Hierarchical Cluster Dendrogram ",
+       subtitle = "filtered, TMM normalized",
+       y = "Distance",
+       x = "Life stage") +
+  coord_fixed(1/2) +
+  theme(axis.title.x = element_text(color = "black"),
+        axis.title.y = element_text(angle = 90),
+        axis.text.y = element_text(angle = 0),
+        axis.line.y = element_line(color = "black"),
+        axis.ticks.y = element_line(color = "black"),
+        axis.ticks.length.y = unit(2, "mm"))
+
+# Principal component analysis (PCA) -------------
+# this also works on a data matrix, not a data frame
+pca.res <- prcomp(t(log2.cpm.filtered.norm), scale.=F, retx=T)
+summary(pca.res) # Prints variance summary for all principal components.
+
+#pca.res$rotation #$rotation shows you how much each gene influenced each PC (called 'scores')
+#pca.res$x # 'x' shows you how much each sample influenced each PC (called 'loadings')
+#note that these have a magnitude and a direction (this is the basis for making a PCA plot)
+## This generates a screeplot: a standard way to view eigenvalues for each PCA. Shows the proportion of variance accounted for by each PC. Plotting only the first 10 dimensions.
+p5<-fviz_eig(pca.res,
+             #barcolor = brewer.pal(8,"Pastel2")[8],
+             #barfill = brewer.pal(8,"Pastel2")[8],
+             linecolor = "black",
+             main = "Scree plot: proportion of variance accounted for by each principal component", ggtheme = theme_bw()) 
+
+pc.var<-pca.res$sdev^2 # sdev^2 captures these eigenvalues from the PCA result
+pc.per<-round(pc.var/sum(pc.var)*100, 1) # we can then use these eigenvalues to calculate the percentage variance explained by each PC
+
+# Visualize the PCA result ------------------
+#lets first plot any two PCs against each other
+#We know how much each sample contributes to each PC (loadings), so let's plot
+pca.res.df <- as_tibble(pca.res$x[,1:2]) %>% 
+  add_column(group = targets$group)
+if (x == 'cele_embryonic') {
+  pca.res.df <- add_column(pca.res.df, block = targets$block)}
+
+# Plotting PC1 and PC2
+if (x == 'cele_embryonic') {
+  p6<-ggplot(pca.res.df) +
+  aes(x=PC1, y=PC2,
+      shape = block,
+      label = group,
+      fill = group,
+      color = group
+  ) +
+  geom_point(size=4) +
+  xlab(paste0("PC1 (",pc.per[1],"%",")")) + 
+  ylab(paste0("PC2 (",pc.per[2],"%",")")) +
+  labs(title="Principal Components Analysis",
+       sub = "Note: analysis is blind to sample identity.",
+       shape = "Experiment", 
+       fill = "Time point",
+       color = "Time point") +
+  scale_x_continuous(expand = c(.3, .3)) +
+  scale_y_continuous(expand = c(.3, .3)) +
+  coord_fixed() +
+  theme_bw() +
+  theme(text = element_text(size = 10),
+        title = element_text(size = 10))
+} else {
+p6<-ggplot(pca.res.df) +
+  aes(x=PC1, y=PC2,
+      label = group,
+      fill = group,
+      color = group
+  ) +
+  geom_point(size=4) +
+  xlab(paste0("PC1 (",pc.per[1],"%",")")) + 
+  ylab(paste0("PC2 (",pc.per[2],"%",")")) +
+  labs(title="Principal Components Analysis",
+       sub = "Note: analysis is blind to sample identity.",
+       fill = "Life stage",
+       color = "Life stage") +
+  scale_x_continuous(expand = c(.3, .3)) +
+  scale_y_continuous(expand = c(.3, .3)) +
+  coord_fixed() +
+  theme_bw() +
+  theme(text = element_text(size = 10),
+        title = element_text(size = 10))
+}
+
+# Create a PCA 'small multiples' chart ----
+if (ncol(pca.res$x)>5){
+  pca.res.df <- pca.res$x[,1:6]}
+else {
+  pca.res.df <- pca.res$x[,1:ncol(pca.res$x)]
+}
+ 
+pca.res.df <- pca.res.df %>% 
+  as_tibble() %>%
+  add_column(sample = targets$sample,
+             group = targets$group)
+
+pca.pivot <- pivot_longer(pca.res.df, # dataframe to be pivoted
+                          cols = PC1:PC3, # column names to be stored as a SINGLE variable
+                          names_to = "PC", # name of that new variable (column)
+                          values_to = "loadings") # name of new variable (column) storing all the values (data)
+PC1<-subset(pca.pivot, PC == "PC1")
+PC2 <-subset(pca.pivot, PC == "PC2")
+PC3 <- subset(pca.pivot, PC == "PC3")
+#PC4 <- subset(pca.pivot, PC == "PC4")
+
+# New facet label names for PCs
+PC.labs <- c(paste0("PC1 (",pc.per[1],"%",")"),
+             paste0("PC2 (",pc.per[2],"%",")"),
+             paste0("PC3 (",pc.per[3],"%",")")
+)
+names(PC.labs) <- c("PC1", "PC2", "PC3")
+
+p7<-ggplot(pca.pivot) +
+  aes(x=sample, y=loadings) + # you could iteratively 'paint' different co-variates onto this plot using the 'fill' aes
+  geom_bar(stat="identity") +
+  facet_wrap(~PC, labeller = labeller(PC = PC.labs)) +
+  geom_bar(data = PC1, stat = "identity", aes(fill = group)) +
+  geom_bar(data = PC2, stat = "identity", aes(fill = group)) +
+  geom_bar(data = PC3, stat = "identity", aes(fill = group)) +
+  labs(title="PCA 'small multiples' plot",
+       fill = "Life stage",
+       caption=paste0("produced on ", Sys.time())) +
+  scale_x_discrete(limits = targets$sample, labels = targets$group) +
+  theme_bw() +
+  theme(text = element_text(size = 10),
+        title = element_text(size = 10))+
+  coord_flip()
+if (x == 'cele_embryonic') {
+  p7 <- p7 +
+    labs(fill = "Time point") +
+    theme(axis.text.y = element_text (size = 5))
+} 
+
+# Save outputs
+output.name <- paste0(x, '_FilteringNormalizationGraphs')
+save(p1, p2, p3, p4, p5, p6, p7, p.discarded, discarded.gene.df,
+     file = file.path(output.path,
+                      output.name))
+
+output.name <- paste0(x, '_DGEList_filtered_normalized')
+save(myDGEList.filtered.norm,
+     file = file.path(output.path,
+                      output.name))
 
 # Save matrix of genes and their filtered, normalized, voom-transformed counts ----
 # This is the count data that underlies the differential expression analyses in the Shiny app. 
@@ -338,7 +539,6 @@ output.name <- paste0(x, '_vDGEList')
 save(v.DGEList.filtered.norm,
      file = file.path(app.path,
                       output.name))
-
 }
 ```
 
@@ -397,7 +597,7 @@ DT::datatable(discarded.gene.df,
 ## *C. briggsae* Filtering Results {.tabset}
 ### Unfiltered, non-normalized log2CPM data
 ```{r, echo = FALSE, include = TRUE}
-rm("p1", "p2", "p3", "p.discarded", "discarded.gene.df")
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
 load(paste0("./Outputs/briggsae_FilteringNormalizationGraphs"))
 p1
 ```
@@ -447,7 +647,7 @@ DT::datatable(discarded.gene.df,
 ## *C. brenneri* Filtering Results {.tabset}
 ### Unfiltered, non-normalized log2CPM data
 ```{r, echo = FALSE, include = TRUE}
-rm("p1", "p2", "p3", "p.discarded", "discarded.gene.df")
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
 load(paste0("./Outputs/brenneri_FilteringNormalizationGraphs"))
 p1
 ```
@@ -497,7 +697,7 @@ DT::datatable(discarded.gene.df,
 ## *C. remanei* Filtering Results {.tabset}
 ### Unfiltered, non-normalized log2CPM data
 ```{r, echo = FALSE, include = TRUE}
-rm("p1", "p2", "p3", "p.discarded", "discarded.gene.df")
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
 load(paste0("./Outputs/remanei_FilteringNormalizationGraphs"))
 p1
 ```
@@ -548,7 +748,7 @@ DT::datatable(discarded.gene.df,
 ## *C. japonica* Filtering Results {.tabset}
 ### Unfiltered, non-normalized log2CPM data
 ```{r, echo = FALSE, include = TRUE}
-rm("p1", "p2", "p3", "p.discarded", "discarded.gene.df")
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
 load(paste0("./Outputs/japonica_FilteringNormalizationGraphs"))
 p1
 ```
@@ -595,7 +795,230 @@ DT::datatable(discarded.gene.df,
                         digits=3)
 ```
 
+## *C. elegans* Embryonic Timeline Filtering Results {.tabset}
+### Unfiltered, non-normalized log2CPM data
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/cele_embryonic_FilteringNormalizationGraphs"))
+p1
+```
 
+### Filtered, non-normalized log2CPM data
+```{r, echo = FALSE, include = TRUE}
+p2
+```
+
+### Filtered, normalized log2CPM data by life stage
+```{r, echo = FALSE, include = TRUE}
+p3
+```
+
+### Genes discarded by low-copy filtering step  
+```{r, echo = FALSE, include = TRUE}
+p.discarded
+```
+
+### Discarded gene list 
+```{r, echo = FALSE, include = TRUE, results = 'asis'}
+
+DT::datatable(discarded.gene.df,
+              rownames = FALSE,
+                      escape = FALSE,
+                      options = list(autoWidth = TRUE,
+                                     scrollX = TRUE,
+                                     scrollY = '300px',
+                                     scrollCollapse = TRUE,
+                                     
+                                     searchHighlight = TRUE, 
+                                     pageLength = 10, 
+                                     lengthMenu = c("5",
+                                                    "10",
+                                                    "25",
+                                                    "50",
+                                                    "100"),
+                                     initComplete = htmlwidgets::JS(
+                                         "function(settings, json) {",
+                                         paste0("$(this.api().table().container()).css({'font-size': '", "10pt", "'});"),
+                                         "}")  
+                      )) %>%
+  DT::formatRound(columns=c(2:(ncol(discarded.gene.df)-10)), 
+                        digits=3)
+```
+
+# Hierarchical Clustering and Principle Components Analysis Results
+## *C. elegans* PCA Results {.tabset}
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/elegans_FilteringNormalizationGraphs"))
+```
+
+### Dendrogram to visualize hierachical clustering  
+Clustering performed on filtered and normalized abundance data using the "complete" method.  
+```{r echo = FALSE}
+p4
+```
+
+### Screeplot of PCA Eigenvalues  
+A scree plot is a standard way to view eigenvalues for each PCA. The plot shows the proportion of variance accounted for by each PC. 
+```{r echo = FALSE}
+p5
+```
+
+### PCA Plot
+Plot of the samples in PCA space. Fill color indicates life stage.  
+```{r echo = FALSE}
+p6
+``` 
+
+### PCA "Small Multiples" Plot
+```{r echo = FALSE}
+p7
+```
+
+## *C. briggsae* PCA Results {.tabset}
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/briggsae_FilteringNormalizationGraphs"))
+```
+
+### Dendrogram to visualize hierachical clustering  
+Clustering performed on filtered and normalized abundance data using the "complete" method.  
+```{r echo = FALSE}
+p4
+```
+
+### Screeplot of PCA Eigenvalues  
+A scree plot is a standard way to view eigenvalues for each PCA. The plot shows the proportion of variance accounted for by each PC. 
+```{r echo = FALSE}
+p5
+```
+
+### PCA Plot
+Plot of the samples in PCA space. Fill color indicates life stage.  
+```{r echo = FALSE}
+p6
+``` 
+
+### PCA "Small Multiples" Plot
+```{r echo = FALSE}
+p7
+```
+
+
+## *C. brenneri* PCA Results {.tabset}
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/brenneri_FilteringNormalizationGraphs"))
+```
+
+### Dendrogram to visualize hierachical clustering  
+Clustering performed on filtered and normalized abundance data using the "complete" method.  
+```{r echo = FALSE}
+p4
+```
+
+### Screeplot of PCA Eigenvalues  
+A scree plot is a standard way to view eigenvalues for each PCA. The plot shows the proportion of variance accounted for by each PC. 
+```{r echo = FALSE}
+p5
+```
+
+### PCA Plot
+Plot of the samples in PCA space. Fill color indicates life stage.  
+```{r echo = FALSE}
+p6
+``` 
+
+### PCA "Small Multiples" Plot
+```{r echo = FALSE}
+p7
+```
+
+## *C. remanei* PCA Results {.tabset}
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/remanei_FilteringNormalizationGraphs"))
+```
+
+### Dendrogram to visualize hierachical clustering  
+Clustering performed on filtered and normalized abundance data using the "complete" method.  
+```{r echo = FALSE}
+p4
+```
+
+### Screeplot of PCA Eigenvalues  
+A scree plot is a standard way to view eigenvalues for each PCA. The plot shows the proportion of variance accounted for by each PC. 
+```{r echo = FALSE}
+p5
+```
+
+### PCA Plot
+Plot of the samples in PCA space. Fill color indicates life stage.  
+```{r echo = FALSE}
+p6
+``` 
+
+### PCA "Small Multiples" Plot
+```{r echo = FALSE}
+p7
+```
+
+## *C. japonica* PCA Results {.tabset}
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/japonica_FilteringNormalizationGraphs"))
+```
+
+### Dendrogram to visualize hierachical clustering  
+Clustering performed on filtered and normalized abundance data using the "complete" method.  
+```{r echo = FALSE}
+p4
+```
+
+### Screeplot of PCA Eigenvalues  
+A scree plot is a standard way to view eigenvalues for each PCA. The plot shows the proportion of variance accounted for by each PC. 
+```{r echo = FALSE}
+p5
+```
+
+### PCA Plot
+Plot of the samples in PCA space. Fill color indicates life stage.  
+```{r echo = FALSE}
+p6
+``` 
+
+### PCA "Small Multiples" Plot
+```{r echo = FALSE}
+p7
+```
+
+## *C. elegans* Embryonic Timeline PCA Results  {.tabset}
+```{r, echo = FALSE, include = TRUE}
+rm("p1", "p2", "p3", "p4", "p5", "p6", "p7","p.discarded", "discarded.gene.df")
+load(paste0("./Outputs/cele_embryonic_FilteringNormalizationGraphs"))
+``` 
+### Dendrogram to visualize hierachical clustering  
+Clustering performed on filtered and normalized abundance data using the "complete" method.  
+```{r echo = FALSE}
+p4
+```
+
+### Screeplot of PCA Eigenvalues  
+A scree plot is a standard way to view eigenvalues for each PCA. The plot shows the proportion of variance accounted for by each PC. 
+```{r echo = FALSE}
+p5
+```
+
+### PCA Plot
+Plot of the samples in PCA space. Fill color indicates life stage.  
+```{r echo = FALSE}
+p6
+``` 
+
+### PCA "Small Multiples" Plot
+```{r echo = FALSE}
+p7
+```
 
 # Appendix I : All code for this report  
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE, include = TRUE}

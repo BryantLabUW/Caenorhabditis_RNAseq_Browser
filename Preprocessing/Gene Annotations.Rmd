@@ -188,7 +188,4 @@ save(annotations,
                       output.name))
 }
 
-
-
-
 ```

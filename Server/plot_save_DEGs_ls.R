@@ -17,15 +17,15 @@ pull_DEGs_LS <- reactive({
     geom_hline(yintercept = -log10(adj.P.thresh), 
                linetype="longdash", 
                colour="grey", 
-               size=1) + 
+               linewidth=1) + 
     geom_vline(xintercept = lfc.thresh, 
                linetype="longdash", 
                colour="#BE684D", 
-               size=1) +
+               linewidth=1) +
     geom_vline(xintercept = -lfc.thresh, 
                linetype="longdash", 
                colour="#2C467A", 
-               size=1) +
+               linewidth=1) +
     labs(title = paste0('Pairwise Comparison: ',
                         gsub('-',
                              ' vs ',
