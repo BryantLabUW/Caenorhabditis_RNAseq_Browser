@@ -32,7 +32,7 @@ Static files that can be interactively downloaded within the *Caenorhabditis* RN
 Contains pre-processing scripts used to generate the files used in the browser.
 
 ## App Setup & Deployment
-To access a stable deployment of the *Caenorhabditis* RNA-seq Browser Web App, please visit:   [hallemlab.shinyapps.io/strongyloides_rnaseq_browser/](https://hallemlab.shinyapps.io/Strongyloides_RNAseq_Browser/)  
+To access a stable deployment of the *Caenorhabditis* RNA-seq Browser Web App, please visit:   [https://bit.ly/CaenSeq](https://bit.ly/CaenSeq)  
 
 
 To run the latest version locally from GitHub, use the following command in R/RStudio:  
@@ -64,13 +64,13 @@ Features of the app include:
   - Display gene expression across life stages for individual genes and their known *Caenorhabditis* homologs
   - Download log2 counts per million expression for genes of interest as .xslx
 * On demand limma-voom-based pairwise differential gene expression analysis
-  - Display results as interactive volcano plots and datatables
+  - Display results as interactive volcano plots and data tables
   - Download results as .pdf (plots) or .xlsx (datatables)
 * Download raw/pre-processed data using user-friendly dropdown menu
   - Study design files (.csv)
   - Log2 counts per million expression for all genes and all samples (.csv)
-  - Variance-stabilized DGEList object (R object; primary data input for the app)
-
+  - DGEList object (R object; primary data input for the app)
+Features of the app include:
 
 ## Sources
 * [Shiny](https://shiny.rstudio.com/) - UI framework
