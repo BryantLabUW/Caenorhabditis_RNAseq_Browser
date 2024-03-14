@@ -28,12 +28,12 @@ observeEvent(input$resetGenes, {
     vals$contrastStage_GW <- NULL
     vals$limmacontrast_GW <- NULL
     vals$target.contrast.options <- NULL
-    vals$target.contrast.options <- vals$v.DGEList.filtered.norm$targets$group
+    vals$target.contrast.options <- vals$DGEList.filtered.norm$targets$group
 })
 
 ## Reset Elements on Tab Change ----   
      observeEvent(input$tab, {
-         vals$v.DGEList.filtered.norm <- NULL
+         vals$DGEList.filtered.norm <- NULL
          shinyjs::reset("GW")
          shinyjs::reset("LS")
          vals$genelist <- NULL

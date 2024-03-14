@@ -1,6 +1,6 @@
 ## GW: Heatmap/Table of Gene Expression ----
 generateHeatmapTable <- reactive({
-  req(vals$genelist,input$displayedGene,vals$genelist.Log2CPM,vals$v.DGEList.filtered.norm)
+  req(vals$genelist,input$displayedGene,vals$genelist.Log2CPM,vals$DGEList.filtered.norm)
   
   # Set gene to display
   vals$gene_of_interest <- vals$genelist$geneID
@@ -30,7 +30,7 @@ generateHeatmapTable <- reactive({
          {suppressMessages(dplyr::full_join(.,excluded.genes))} 
     
     n_num_cols <- ncol(gene_vals)
-    n_num_values <- nlevels(vals$v.DGEList.filtered.norm$targets$group)
+    n_num_values <- nlevels(vals$DGEList.filtered.norm$targets$group)
     setProgress(0.4)
     gene_vals.datatable <- gene_vals %>%
       DT::datatable(rownames = FALSE,
@@ -95,23 +95,21 @@ generateHeatmapTable <- reactive({
     diffGenes <- vals$diffGenes.df %>%
       dplyr::select(!geneID) %>%
       as.matrix()
-    rownames(diffGenes) <- rownames(vals$v.DGEList.filtered.norm$E)
+    rownames(diffGenes) <- rownames(vals$DGEList.filtered.norm$E)
     subset.diffGenes<- diffGenes[vals$gene_of_interest,]
 
-    renaming.rows <- vals$v.DGEList.filtered.norm$genes[rownames(subset.diffGenes),c("geneID", "geneName")]
+    renaming.rows <- vals$DGEList.filtered.norm$genes[rownames(subset.diffGenes),c("geneID", "geneName")]
     rownames(subset.diffGenes) <- paste0(renaming.rows$geneID, " | ", renaming.rows$geneName)
 
     setProgress(0.2)
+    options(warn = 2)
+    spearmancorr <- try(cor(subset.diffGenes, method="spearman"), silent = T)
+    
+    validate(need(!is(spearmancorr, "try-error"), 'Error: heatmap column clustering cannot be performed by likely because the expression levels of the selected genes are too similar in too many life stages.
+                  Please try again with more genes, or switch to single-gene plots.'))
     clustColumns <- hclust(as.dist(1-cor(subset.diffGenes, method="spearman")), method="complete")
-    
-    colnames(subset.diffGenes) <- paste0(vals$v.DGEList.filtered.norm$targets$group,
-                                         ".",
-                                         substr(vals$v.DGEList.filtered.norm$targets$samples, 
-                                                nchar(
-                                                  as.character(vals$v.DGEList.filtered.norm$targets$samples[1]))-2, nchar(
-                                                    as.character(vals$v.DGEList.filtered.norm$targets$samples[1])))
-    )
-    
+    options(warn = 1)
+
     setProgress(0.4)
     
     clustRows <- hclust(as.dist(1-cor(t(subset.diffGenes), 
@@ -126,11 +124,11 @@ generateHeatmapTable <- reactive({
     hovertext <- as.data.frame(subset.diffGenes) %>%
       round(digits = 2)
     
-    colnames(hovertext) <- vals$v.DGEList.filtered.norm$targets$samples
+    colnames(hovertext) <- vals$DGEList.filtered.norm$targets$samples
     hovertext[] <- lapply(seq_along(hovertext), function(x){
       paste0("GeneID: ", rownames(hovertext), "<br>",
              "Log2CPM: ", hovertext[,x], "<br>",
-             "Life Stage: ", vals$v.DGEList.filtered.norm$targets$group[x],
+             "Life Stage: ", vals$DGEList.filtered.norm$targets$group[x],
              "<br>",
              "Sample: ", colnames(hovertext)[x])
     })
@@ -171,7 +169,10 @@ generateGenePlot <- reactive({
     dplyr::mutate(geneID = paste0(geneID, " | ", geneName)) %>%
     dplyr::filter(geneID == vals$gene_of_interest)
   setProgress(0.5)
-  
+  # Identify the identity of the primary species
+  source('Server/switch_species.R', local = T)
+  if (species == 'elegans'){gene_vals$life_stage <- factor(gene_vals$life_stage, levels = c("EE_028", "EE_118", "EE_199","EE_285", "EE_378", "EE_467", "EE_574", "EE_674", "L1", "L2", "L3", "L4", "L4_male", "YA", "Dauer", "DauerEntry", "DauerExit") )
+  }
   p <- suppressWarnings (ggplot(gene_vals) + 
                            aes(x = life_stage, y = log2CPM, 
                                fill = life_stage) +
@@ -190,18 +191,17 @@ generateGenePlot <- reactive({
                                 subtitle=paste("Selected gene:",
                                                gene_vals$geneID[1])) +
                            theme_Publication() + 
-                           theme(aspect.ratio=2/4))
+                           theme(aspect.ratio=2/3))
   
   # Identify the identity of the primary species
   source('Server/switch_species.R', local = T)
 
-  if (species == 'cele_embryonic') {
+  if (species == 'elegans') {
     p <- p +
-      labs(x = "Time point") +
       theme(axis.text.x = element_text(
               angle = 45,
               hjust = 1),
-            aspect.ratio=2/5)
+            aspect.ratio=2/8)
   } 
   
   vals$gene_plot <- p
@@ -214,7 +214,7 @@ generateGenePlot <- reactive({
 ## species, collect expression data from those gene homologs, and plot
 fetch_homologs <- reactive({
   req(vals$genelist.Log2CPM, vals$genelist)
-  
+ 
   Primary.species <- vals$genelist.Log2CPM %>%
     dplyr::filter(geneID %in% vals$genelist$geneID) %>%
     left_join(vals$annotations, by = "geneID") %>%
@@ -234,53 +234,53 @@ fetch_homologs <- reactive({
   source('Server/switch_species.R', local = T)
   
   # Load expression data for GS1-4 species
-  load(file = paste0("./Data/",species.GS1,"_vDGEList"))
-  species.GS1.Log2CPM<-v.DGEList.filtered.norm$E %>%
+  load(file = paste0("./Data/",species.GS1,"_DGEList"))
+  species.GS1.Log2CPM<-DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
+                    as.character(DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
     dplyr::filter(geneID %in% genelist.allspecies$GS1_homologID)
-  remove(v.DGEList.filtered.norm)
+  remove(DGEList.filtered.norm)
   
-  load(file = paste0("./Data/",species.GS2,"_vDGEList"))
-  species.GS2.Log2CPM<-v.DGEList.filtered.norm$E %>%
+  load(file = paste0("./Data/",species.GS2,"_DGEList"))
+  species.GS2.Log2CPM<-DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
+                    as.character(DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
     dplyr::filter(geneID %in% genelist.allspecies$GS2_homologID)
-  remove(v.DGEList.filtered.norm)
+  remove(DGEList.filtered.norm)
   
-  load(file = paste0("./Data/",species.GS3,"_vDGEList"))
-  species.GS3.Log2CPM<-v.DGEList.filtered.norm$E %>%
+  load(file = paste0("./Data/",species.GS3,"_DGEList"))
+  species.GS3.Log2CPM<-DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
+                    as.character(DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
     dplyr::filter(geneID %in% genelist.allspecies$GS3_homologID)
-  remove(v.DGEList.filtered.norm)
+  remove(DGEList.filtered.norm)
   
-  load(file = paste0("./Data/",species.GS4,"_vDGEList"))
-  species.GS4.Log2CPM<-v.DGEList.filtered.norm$E %>%
+  load(file = paste0("./Data/",species.GS4,"_DGEList"))
+  species.GS4.Log2CPM<-DGEList.filtered.norm$E %>%
     as_tibble(rownames = "geneID")%>%
     setNames(nm = c("geneID", 
-                    as.character(v.DGEList.filtered.norm$targets$group))) %>%
+                    as.character(DGEList.filtered.norm$targets$group))) %>%
     pivot_longer(cols = -geneID,
                  names_to = "life_stage", 
                  values_to = "log2CPM") %>%
     group_by(geneID, life_stage) %>%
     dplyr::filter(grepl(genelist.allspecies$GS4_homologID[1], geneID))
-  remove(v.DGEList.filtered.norm)
+  remove(DGEList.filtered.norm)
 
   life_stage_types <- lifestage_legend %>%
     dplyr::select(-group) %>%
@@ -438,7 +438,8 @@ observe({
                                             plotOutput('CPM')),
                                    tabPanel(p(em("Caenorhabditis"), "Homologs"), 
                                             plotOutput('CPM.homologs'),
-                                            em('Note: homologous genes are identified based on WormBase annotations and may not be accurate.'))
+                                            em('Note: homologous genes are identified based on WormBase annotations and may not be accurate.
+                                               In addition, C. elegans and C. briggsae data are variance-stabilized log2CPM values, other species\' data is not variance-stabilized.'))
                        )
                        
       ))
@@ -475,21 +476,21 @@ output$downloadGenePlot <- downloadHandler(
         myheatcolors <- RdBu(75)
         diffGenes <- vals$diffGenes.df %>%
           dplyr::select(!geneID)
-        colnames(diffGenes) <- vals$v.DGEList.filtered.norm$target$group
+        colnames(diffGenes) <- vals$DGEList.filtered.norm$target$group
         diffGenes <- diffGenes %>%
           as.matrix()
         
-        rownames(diffGenes) <- rownames(vals$v.DGEList.filtered.norm$E)
+        rownames(diffGenes) <- rownames(vals$DGEList.filtered.norm$E)
         subset.diffGenes<- diffGenes[vals$gene_of_interest,]
         
         clustColumns <- hclust(as.dist(1-cor(subset.diffGenes, method="spearman")), method="complete")
         
-        colnames(subset.diffGenes) <- paste0(vals$v.DGEList.filtered.norm$targets$group,
+        colnames(subset.diffGenes) <- paste0(vals$DGEList.filtered.norm$targets$group,
                                              "...",
-                                             substr(vals$v.DGEList.filtered.norm$targets$samples,
+                                             substr(vals$DGEList.filtered.norm$targets$samples,
                                                     nchar(
-                                                      as.character(vals$v.DGEList.filtered.norm$targets$samples[1]))-2, nchar(
-                                                        as.character(vals$v.DGEList.filtered.norm$targets$samples[1])))
+                                                      as.character(vals$DGEList.filtered.norm$targets$samples[1]))-2, nchar(
+                                                        as.character(vals$DGEList.filtered.norm$targets$samples[1])))
         )
         
         setProgress(0.4)
@@ -575,7 +576,7 @@ output$downloadbuttonsGenes <- renderUI({
     genelist.expression <- list(genelist.expression)
     
   } else {
-    vals$genelist.Log2CPM$sampleID <- rep(as.character(vals$v.DGEList.filtered.norm$targets$samples),
+    vals$genelist.Log2CPM$sampleID <- rep(as.character(vals$DGEList.filtered.norm$targets$samples),
                                           times =  nrow(vals$genelist))
     
     genelist.expression <-  vals$genelist.Log2CPM %>%

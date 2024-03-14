@@ -7,10 +7,22 @@ observeEvent({input$resetGW
         
     })
 
+## GW: Notification of Blocked DGE Analysis ----
+output$noDGEallowed_GW<- renderUI({
+  req(vals$DGEList.filtered.norm)
+  req (input$selectSpecies_GW == "C. brenneri" | input$selectSpecies_GW == "C. japonica" | input$selectSpecies_GW == "C. remanei")
+  
+  alert(
+    status = "success",
+    id = "noDGE_GW", 
+    "Differential gene expression analyses are not available for this species. Please use caution when interpreting gene expression values plotted above.")
+})
+  
 ## GW: Generate Comparison Selection Boxes ----
 output$pairwiseSelector_GW<- renderUI({
-    req(vals$v.DGEList.filtered.norm)
-    
+    req(vals$DGEList.filtered.norm)
+    req (input$selectSpecies_GW == "C. elegans" | input$selectSpecies_GW == "C. briggsae")
+
     list(
         panel(
             # Select Life Stage Comparisons 
@@ -135,7 +147,7 @@ parse_contrasts_GW <- eventReactive(input$goLifeStage_GW,{
         } else vals$multipleCorrection_GW <- F
     } else if (str_detect(input$selectContrast_GW[[1]], 'everythingElse')){
         targetStage <- rbind(input$selectTarget_GW)
-        contrastStage <- setdiff(levels(vals$v.DGEList.filtered.norm$targets$group),targetStage) %>%
+        contrastStage <- setdiff(levels(vals$DGEList.filtered.norm$targets$group),targetStage) %>%
             cbind()
         targetStage <- rep_len(targetStage,length(contrastStage)) %>%
             cbind()
@@ -153,7 +165,7 @@ parse_contrasts_GW <- eventReactive(input$goLifeStage_GW,{
         } else vals$multipleCorrection_GW <- F
     } else if (str_detect(input$selectContrast_GW[[1]], 'remainingGroup')){
         targetStage <- rbind(input$selectTarget_GW)
-        contrastStage <- setdiff(levels(vals$v.DGEList.filtered.norm$targets$group),targetStage) %>%
+        contrastStage <- setdiff(levels(vals$DGEList.filtered.norm$targets$group),targetStage) %>%
             rbind()
         comparison <- paste(paste0(targetStage, 
                          collapse = "+") %>%
@@ -206,13 +218,13 @@ parse_contrasts_GW <- eventReactive(input$goLifeStage_GW,{
     # 2. Do contrasts include recognized life stages (corrects for spelling mistakes); compare relative to abbreviated names in lifestage_legend
     ## Do all target elements match a life stage in this dataset? 
     error.targets.validNames <- targetStage[targetStage != ""] %in% 
-        levels(vals$v.DGEList.filtered.norm$targets$group) 
+        levels(vals$DGEList.filtered.norm$targets$group) 
     shiny::validate(shiny::need(all(error.targets.validNames), 
                                 message = "At least one target name doesn't match available life stages. Please check inputs for spelling mistakes or incorrect capitalization.")) 
     
     ## Do all contrast elements match a life stage in this dataset?
     error.contrast.validNames <- contrastStage[contrastStage != ""] %in% 
-        levels(vals$v.DGEList.filtered.norm$targets$group) 
+        levels(vals$DGEList.filtered.norm$targets$group) 
     shiny::validate(shiny::need(all(error.contrast.validNames), 
                                 message = "At least one contrast name doesn't match available life stages. Please check inputs for spelling mistakes or incorrect capitalization.")) 
     

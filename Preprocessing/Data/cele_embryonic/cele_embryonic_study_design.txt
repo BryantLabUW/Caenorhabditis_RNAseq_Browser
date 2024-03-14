@@ -1,64 +1,17 @@
-sample	stage	method	block	group	Biological_ID	subgroups	Description	Organ/Tissue	Age	Sex	Biological Replicate	RNA Fraction	Read Type	Stranded/Unstranded	Library Type	Library ID#	# of Mate Pairs	# of Single Reads	Ribosomal Depletion	Spike In Pool	Published/PMINS
-SRS004859	EE_0	polyA	polyA	EE_000	N2_EE_50-0		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 0 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100,2X76"	Unstranded	N.D.	N/A	"18,133,008"	"265,627"	No	N/A	Y; 21177976
-SRS269390	EE_30	polyA	polyA	EE_030	N2_EE_50-30		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 30 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100,2X76"	Unstranded	N.D.	N/A	"11,432,603"	"785,858"	No	N/A	Y;  21177976
-SRS269389	EE_60	polyA	polyA	EE_060	N2_EE_50-60		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 60 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"2X100,2X76"	Unstranded	N.D.	N/A	"10,589,168"	0	No	N/A	Y;  21177976
-SRS174229	EE_210	polyA	polyA	EE_210	N2_EE_50-210		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 210 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100"	Unstranded	N.D.	N/A	"9,760,861"	"701,572"	No	N/A	Y; 21177976
-SRS001790	EE_240	polyA	polyA	EE_240	N2_EE_50-240		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 240 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"9,391,671"	0	No	N/A	Y; 21177976
-SRS150938	EE_300	polyA	polyA	EE_300	N2_EE_50-300		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 300 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"12,182,604"	0	No	N/A	Y; 21177976
-SRS001791	EE_330	polyA	polyA	EE_330	N2_EE_50-330		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 330 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"10,873,497"	0	No	N/A	Y; 21177976
-SRS004864	EE_360	polyA	polyA	EE_360	N2_EE_50-360		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 360 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"10,788,062"	0	No	N/A	Y; 21177976
-SRS003000	EE_390	polyA	polyA	EE_390	N2_EE_50-390		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 390 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100"	Unstranded	N.D.	N/A	"10,313,574"	"645,881"	No	N/A	Y; 21177976
-SRS174140	EE_420	polyA	polyA	EE_420	N2_EE_50-420		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 420 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"11,836,263"	0	No	N/A	Y; 21177976
-SRS001789	EE_450	polyA	polyA	EE_450	N2_EE_50-450		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 450 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"18,540,513"	0	No	N/A	Y; 21177976
-SRS178501	EE_480	polyA	polyA	EE_480	N2_EE_50-480		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 480 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100"	Unstranded	N.D.	N/A	"17,846,952"	"2,558,006"	No	N/A	Y; 21177976
-SRS266278	EE_510	polyA	polyA	EE_510	N2_EE_50-510		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 510 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100"	Unstranded	N.D.	N/A	"15,833,131"	"3,337,176"	No	N/A	Y; 21177976
-SRS266272	EE_540	polyA	polyA	EE_540	N2_EE_50-540		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 540 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100"	Unstranded	N.D.	N/A	"18,360,363"	"2,552,015"	No	N/A	Y; 21177976
-SRS266261	EE_570	polyA	polyA	EE_570	N2_EE_50-570		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 570 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"17,506,528"	0	No	N/A	Y; 21177976
-SRS266262	EE_600	polyA	polyA	EE_600	N2_EE_50-600		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 600 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	"1X100,2X100"	Unstranded	N.D.	N/A	"14,880,656"	"1,816,771"	No	N/A	Y; 21177976
-SRS266263	EE_630	polyA	polyA	EE_630	N2_EE_50-630		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 630 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"16,992,196"	0	No	N/A	Y; 21177976
-SRS266264	EE_660	polyA	polyA	EE_660	N2_EE_50-660		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 660 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"15,100,347"	0	No	N/A	Y; 21177976
-SRS266273	EE_690	polyA	polyA	EE_690	N2_EE_50-690		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 690 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"12,533,518"	0	No	N/A	Y; 21177976
-SRS266279	EE_720	polyA	polyA	EE_720	N2_EE_50-720		"N2 embryonic time point data, polyA+ RNAseq  - make eggs, hatch in absence of food to L1 arrest, add food, wait 50 hours, harvest eggs, incubate 720 minutes"	Whole organism	EE	hermaphrodite	1	PolyA(+)	2X100	Unstranded	N.D.	N/A	"15,112,287"	0	No	N/A	Y; 21177976
-0A	EMB_0	wholeRNA	wR_223	EE_000	20120223_EMB-0																
-0B	EMB_0	wholeRNA	wR_411	EE_000	20120411_EMB-0																
-30A	EMB_30	wholeRNA	wR_223	EE_030	20120223_EMB-30																
-30B	EMB_30	wholeRNA	wR_419	EE_030	20120419_EMB-30																
-60A	EMB_60	wholeRNA	wR_223	EE_060	20120223_EMB-60																
-60B	EMB_60	wholeRNA	wR_411	EE_060	20120411_EMB-60																
-90A	EMB_90	wholeRNA	wR_223	EE_090	20120223_EMB-90																
-90B	EMB_90	wholeRNA	wR_411	EE_090	20120411_EMB-90																
-90C	EMB_90	wholeRNA	wR_419	EE_090	20120419_EMB-90																
-120A	EMB_120	wholeRNA	wR_223	EE_120	20120223_EMB-120																
-120B	EMB_120	wholeRNA	wR_411	EE_120	20120411_EMB-120																
-120C	EMB_120	wholeRNA	wR_419	EE_120	20120419_EMB-120																
-150A	EMB_150	wholeRNA	wR_223	EE_150	20120223_EMB-150																
-150B	EMB_150	wholeRNA	wR_411	EE_150	20120411_EMB-150																
-150C	EMB_150	wholeRNA	wR_419	EE_150	20120419_EMB-150																
-180A	EMB_180	wholeRNA	wR_223	EE_180	20120223_EMB-180																
-180B	EMB_180	wholeRNA	wR_411	EE_180	20120411_EMB-180																
-180C	EMB_180	wholeRNA	wR_419	EE_180	20120419_EMB-180																
-210A	EMB_210	wholeRNA	wR_223	EE_210	20120223_EMB-210																
-240A	EMB_240	wholeRNA	wR_223	EE_240	20120223_EMB-240																
-240B	EMB_240	wholeRNA	wR_411	EE_240	20120411_EMB-240																
-240C	EMB_240	wholeRNA	wR_419	EE_240	20120419_EMB-240																
-270A	EMB_270	wholeRNA	wR_223	EE_270	20120223_EMB-270																
-270B	EMB_270	wholeRNA	wR_419	EE_270	20120419_EMB-270																
-300A	EMB_300	wholeRNA	wR_223	EE_300	20120223_EMB-300																
-300B	EMB_300	wholeRNA	wR_411	EE_300	20120411_EMB-300																
-300C	EMB_300	wholeRNA	wR_419	EE_300	20120419_EMB-300																
-330A	EMB_330	wholeRNA	wR_223	EE_330	20120223_EMB-330																
-330B	EMB_330	wholeRNA	wR_419	EE_330	20120419_EMB-330																
-360A	EMB_360	wholeRNA	wR_223	EE_360	20120223_EMB-360																
-360B	EMB_360	wholeRNA	wR_411	EE_360	20120411_EMB-360																
-360C	EMB_360	wholeRNA	wR_419	EE_360	20120419_EMB-360																
-390A	EMB_390	wholeRNA	wR_223	EE_390	20120223_EMB-390																
-420A	EMB_420	wholeRNA	wR_223	EE_420	20120223_EMB-420																
-420B	EMB_420	wholeRNA	wR_419	EE_420	20120419_EMB-420																
-450A	EMB_450	wholeRNA	wR_223	EE_450	20120223_EMB-450																
-450B	EMB_450	wholeRNA	wR_419	EE_450	20120419_EMB-450																
-480A	EMB_480	wholeRNA	wR_223	EE_480	20120223_EMB-480																
-510A	EMB_510	wholeRNA	wR_223	EE_510	20120223_EMB-510																
-540A	EMB_540	wholeRNA	wR_223	EE_540	20120223_EMB-540																
-570A	EMB_570	wholeRNA	wR_223	EE_570	20120223_EMB-570																
-600A	EMB_600	wholeRNA	wR_223	EE_600	20120223_EMB-600																
-600B	EMB_600	wholeRNA	wR_411	EE_600	20120411_EMB-600																
+sample	group	Biological_ID	RNA sample = total RNA or polyA +	SRA Sample Accession	SRA Run Accession	Project	Library description
+N2_4cell_EE_RZ-56	EE_028	N2_4cell_EE_RZ-56	total	SRS311761	"SRR493099,SRR493100"		Caenorhabditis elegans N2 hand-picked 4 cell embryos ribo-zero treated library 1
+20120223_EMB-0	EE_028	20120223_EMB-0	total	SRS931097	"SRR2012783,SRR2012784,SRR2012785,SRR2012782"	20120223_EMB-0	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 0 minutes"
+20120223_EMB-60	EE_118	20120223_EMB-60	total	SRS931098	"SRR2012787,SRR2012788,SRR2012789,SRR2012786"	20120223_EMB-60	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 60 minutes"
+20120223_EMB-90	EE_118	20120223_EMB-90	total	SRS931099	"SRR2012791,SRR2012792,SRR2012793,SRR2012790"	20120223_EMB-90	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 90 minutes"
+20120223_EMB-150	EE_199	20120223_EMB-150	total	SRS931095	"SRR2012775,SRR2012776,SRR2012777,SRR2012774"	20120223_EMB-150	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 150 minutes"
+20120223_EMB-300	EE_378	20120223_EMB-300	total	SRS932422	"SRR2015276,SRR2015277,SRR2015278,SRR2015275"	20120223_EMB-300	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 300 minutes"
+20120223_EMB-390	EE_467	20120223_EMB-390	total	SRS932420	"SRR2015268,SRR2015269,SRR2015270,SRR2015267"	20120223_EMB-390	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 390 minutes"
+20120223_EMB-480	EE_574	20120223_EMB-480	total	SRS932425	"SRR2015288,SRR2015289,SRR2015290,SRR2015287"	20120223_EMB-480	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 480 minutes"
+20120223_EMB-570	EE_674	20120223_EMB-570	total	SRS932432	"SRR2015307,SRR2015308,SRR2015309,SRR2015306"	20120223_EMB-570	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 570 minutes"
+20120223_EMB-600	EE_674	20120223_EMB-600	total	SRS932431	"SRR2015303,SRR2015304,SRR2015305,SRR2015302"	20120223_EMB-600	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 600 minutes"
+20120411_EMB-180	EE_285	20120411_EMB-180	total	SRS932437	"SRR2015318,SRR2015319"	20120411_EMB-180	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 180 minutes"
+20120419_EMB-120	EE_199	20120419_EMB-120	total	SRS932475	"SRR2015473,SRR2015474"	20120419_EMB-120	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 120 minutes"
+20120419_EMB-180	EE_285	20120419_EMB-180	total	SRS932477	"SRR2015477,SRR2015478"	20120419_EMB-180	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 180 minutes"
+20120419_EMB-270	EE_378	20120419_EMB-270	total	SRS932479	"SRR2015481,SRR2015482"	20120419_EMB-270	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 270 minutes"
+20120419_EMB-330	EE_467	20120419_EMB-330	total	SRS932481	"SRR2015485,SRR2015486"	20120419_EMB-330	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 330 minutes"
+20120419_EMB-420	EE_574	20120419_EMB-420	total	SRS932483	"SRR2015489,SRR2015490"	20120419_EMB-420	"C. elegans N2 strain at University of Washington (Chau Huynh), synchronized L1s, grow 48 hours to YA, 20-25 large plates of YA, bleach, get synchronous large volume of embryos, sample at 420 minutes"

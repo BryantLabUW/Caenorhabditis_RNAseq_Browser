@@ -4,29 +4,26 @@ Each genome and gff file were downloaded from WormBase.org version WS290. Reads 
 ### Gene Annotation
 Read data for each species was imported into R and annotated with information from WormBase ParaSite BiomaRT. 
 
-Raw reads were quantified as counts per million using the EdgeR package, then filtered to remove transcripts with low counts (less than 1 count-per-million). A list of discarded genes and their expression values across life stages was saved. Non-discarded gene values were normalized using the trimmed mean of M-values method (TMM, [Robinson and Oshlack](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25) ) to permit between-samples comparisons. The mean-variance relationship was modeled using a precision weights approach [Law *et al* 2014](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29).  
-
 ### Filtering and Normalization Steps
-
 Raw reads were quantified as log2 counts per million (CPM) using the `EdgeR` package,
-then filtered to remove transcripts with low counts (less than 1
-log2CPM in at least 1 sample). Non-discarded gene values are
-normalized using the trimmed mean of M-values method [(TMM, Robinson and
-Oshlack)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25)
-to permit between-samples comparisons. The mean-variance relationship
-was modeled using a precision weights approach [(Law *et al*
-2014)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29).
+then filtered to remove transcripts with low counts.  Non-discarded gene values are
+normalized using the trimmed mean of M-values method (TMM, [Robinson and Oshlack](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25))
+to permit between-samples comparisons. 
 
-These steps produced a variance-stabilized digital gene expression list (vDGEList), which serves as the primary input to the Shiny App.
+### Variance Stabilization and EList Generation
+For *C. briggsae* and *C. elegans*, samples contain significant numbers of biological replicates. Thus these samples were additionally pre-processed for differential gene expression analyses. The mean-variance relationship was modeled using a precision weights approach ([Law *et al* 2014](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29)), using the `voom` function in the `limma` package. This function produced a variance-stabilized DGEList object that includes precision weights for each gene to control for heteroscedasity, as well as normalized expression values on the log2 scale (log2 counts-per-million). 
+
+For *C. remanei*, *C. japonica*, and *C. brenneri*, the lack of consistent biological replicates precludes `limma::voom` processing and downstream differential expression calculations. To enable app users to visualize gene count data, a DGEList object was manually constructed that contained filtered, normalized log2CPM values, gene annotations information, and sample information. This file can be loaded into the RNA-seq Browser for plotting. 
+
+For *C. elegans* embryonic timeline data, samples are from four previously published time series. Biological replicates are defined by a previously established inferred timeline that unified samples between these embryo time series ([Boeck *et al*., 2016](https://pubmed.ncbi.nlm.nih.gov/27531719/)). Group names represent the average time for biological replicate pairs, which were selected to represent 80 minute developmental intervals. This timing was chosen to match previously published differential expression analyses.
 
 ### Saved Output Files
-
 During pre-processing, the following required data files were saved and
 are imported into Shiny application upon species initialization:
 
-1.  a gene annotation R object (`_geneAnnotations`)
-2.  the variance-stabilized vDGEList, saved as an R object
-    (`_vDGEList`)
-3.  a matrix of variance-stabilized gene expression data, extracted from
-    the vDGEList (`log2cpm_filtered_norm_voom.csv`) - this data
-    is downloadable from within the Browser App
+1.  For all species, a gene annotation R object (`_geneAnnotations`).  
+2.  For *C. elegans* and *C. briggsae*, a DGEList R object containing variance-stabilized, filtered and normalized log2CPM data
+    (`_DGEList`), and a matrix of  variance-stabilized, filtered and normalized gene expression data (`log2cpm.csv`).  
+3.  For *C. remanei*, *C. japonica*, and *C. brenneri*, a DGEList R object containing filtered and normalized log2CPM data (`_DGEList`), and a matrix of filtered and normalized gene gene expression data (`log2cpm.csv`).  
+
+These data sets can be downloaded from within the Browser App.

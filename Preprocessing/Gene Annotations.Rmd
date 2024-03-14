@@ -198,14 +198,6 @@ if (x == "caelegprjna13758"){
                   GS1_percent_homology = NA) %>%
     relocate(GS1_homologID, .after = InterPro)
 }
-
-save(annotations,
-     file = file.path(output.path,
-                      'cele_embryonic_geneAnnotations'))
-# Save in Shiny app Data folder
-save(annotations,
-     file = file.path(app.path,
-                      'cele_embryonic_geneAnnotations'))
 }
 
 ```

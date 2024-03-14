@@ -16,7 +16,7 @@ pull_DEGs_LS <- reactive({
     geom_point(size=2) +
     geom_hline(yintercept = -log10(adj.P.thresh), 
                linetype="longdash", 
-               colour="grey", 
+               colour="black", 
                linewidth=1) + 
     geom_vline(xintercept = lfc.thresh, 
                linetype="longdash", 
@@ -30,7 +30,7 @@ pull_DEGs_LS <- reactive({
                         gsub('-',
                              ' vs ',
                              vals$comparison_LS[vals$displayedComparison_LS])),
-         subtitle = paste0("grey line: p = ",
+         subtitle = paste0("black dashed line: p = ",
                            adj.P.thresh, "; colored lines: log-fold change = +/-", lfc.thresh),
          color = "GeneIDs",
          y = "BH-adjusted p-value",
@@ -170,8 +170,8 @@ assemble_DEGs_LS <- reactive({
   cS<- vals$contrastStage_LS[vals$displayedComparison_LS,
                              ][vals$contrastStage_LS[vals$displayedComparison_LS,
                                                      ]!=""]
-  sample.num.tS <- sapply(tS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
-  sample.num.cS <- sapply(cS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
+  sample.num.tS <- sapply(tS, function(x) {colSums(vals$DGEList.filtered.norm$design)[[x]]}) %>% sum()
+  sample.num.cS <- sapply(cS, function(x) {colSums(vals$DGEList.filtered.norm$design)[[x]]}) %>% sum()
   
   n_num_cols <- sample.num.tS + sample.num.cS + 6
   index_homologs <- length(colnames(vals$list.highlight.tbl_LS[[vals$displayedComparison_LS]])) - 6

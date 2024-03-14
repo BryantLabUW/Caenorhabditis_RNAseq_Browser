@@ -140,11 +140,6 @@ tags$head(
     color: #772953;
     }
     
-    .nav-pills li {
-    font-size: 15px;
-    font-weight: bold;
-    }
-    
     .nav-pills {
     border-bottom: 1px solid #e95420;
     }

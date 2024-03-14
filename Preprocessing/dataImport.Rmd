@@ -1,0 +1,39 @@
+## Data Import
+```{r}
+# read in the study design ----
+targets <- read_tsv(paste0("./Data/", x, "/", x,"_study_design.txt"),
+                    na = c("", "NA", "na"), show_col_types = F)
+
+# load pre-generated annotation information
+load(paste0("./Outputs/",x,"_geneAnnotations"))
+
+# import featureCount output into R ----
+path <- paste0("./Data/", x, "/featureCount.C_", x,".", targets$Biological_ID, ".CDS.unique_only.ws290.txt")
+
+
+featureCountData<- rbindlist(lapply(path, fread), idcol="sample") %>%
+mutate(sample = targets$sample[sample])
+colnames(featureCountData)<-c('sample','geneID', 'geneName', 'stableID', "location", "length", "count")
+
+featureCountData_wider <- featureCountData %>%
+  dplyr::select(!c(location, length)) %>%
+  pivot_wider(names_from = sample, values_from = count)
+
+counts <- featureCountData_wider %>%
+  dplyr::select(-stableID)%>%
+  column_to_rownames(var = "geneID")
+
+annotations_sub<-dplyr::select(featureCountData_wider, geneID) %>%
+  left_join(annotations, by = "geneID") 
+
+# generate a DGEList
+myDGEList <- DGEList(counts,
+                     samples = targets$sample,
+                     group = targets$group, 
+                     genes = annotations_sub)
+
+output.name <- paste0(x, '_DGEList')
+save(myDGEList,
+     file = file.path(output.path,
+                      output.name))
+```

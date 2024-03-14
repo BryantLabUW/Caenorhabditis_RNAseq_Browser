@@ -1,5 +1,5 @@
 ### Overview  
-The *Caenorhabditis* RNA-seq Browser enables users to browse *Caenorhabditis* bulk RNA-seq data sets generated as part of the modENCODE project and perform on-demand differential expression analyses. Data from the following species are currently included: *C. elegans*, *C. briggsae*, *C. brenneri*, *C. japonica*, and *C. remanei*. The app permits
+The *Caenorhabditis* RNA-seq Browser enables users to browse *Caenorhabditis* bulk RNA-seq data sets generated as part of the modENCODE project and perform on-demand differential expression analyses. Data from the following species are currently included in this app: *C. elegans*, *C. briggsae*, *C. brenneri*, *C. japonica*, and *C. remanei*. The app permits
 browsing RNA-seq data in two modes:
 
 1.  Browse by Gene Mode
@@ -23,7 +23,7 @@ analysis
 -   Study design files (.csv)
 -   Log2 counts per million expression for all genes and all samples
 (.csv)
--   Variance-stabilized DGEList object (R object; primary data input
+-   DGEList object (R object; primary data input
 for the app)
 
 

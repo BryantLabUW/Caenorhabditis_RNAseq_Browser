@@ -45,8 +45,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                                                   "C. briggsae",
                                                                   "C. brenneri",
                                                                   "C. japonica",
-                                                                  "C. remanei",
-                                                                  "C. elegans Embryonic Timeline")
+                                                                  "C. remanei")
                                        ),
                                        actionButton('speciesGW',
                                                     'Initialize',
@@ -62,7 +61,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                                                       NULL, 
                                                                       c("Study Design",
                                                                         "Log2CPM Gene Counts",
-                                                                        "vDGEList"),
+                                                                        "DGEList"),
                                                                       options = list(style = 'btn btn-default')),
                                                           uiOutput("StudyInfo.panel.GW")
                                                     )
@@ -115,12 +114,15 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                    )
                                    
                             ),
-                            
                             column(9,
                                    conditionalPanel(condition = "(output.downloadbuttonsGenes && input.goLifeStage_GW != 0)",
                                                     uiOutput("volcano_GW")
-                                   )
+                                   )),
+                            column(12,
+                                   conditionalPanel(condition = "(output.downloadbuttonsGenes && (input.selectSpecies_GW == 'C. brenneri' | input.selectSpecies_GW == 'C. japonica' | input.selectSpecies_GW == 'C. remanei'))", 
+                                                    uiOutput("noDGEallowed_GW"))
                             )),
+                        
                         ## Fluid Row 5: Download Options for Saving DGE Table Results Panel + Differential Gene Expression Table ----
                         fluidRow(
                             column(3,
@@ -203,11 +205,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                        selectInput("selectSpecies_LS",
                                                    h6("Pick a species"),
                                                    choices = list("C. elegans",
-                                                                  "C. briggsae",
-                                                                  "C. brenneri",
-                                                                  "C. japonica",
-                                                                  "C. remanei",
-                                                                  "C. elegans Embryonic Timeline")),
+                                                                  "C. briggsae")),
                                        actionButton('speciesLS',
                                                     'Initialize',
                                                     icon = icon("fas fa-share"),
@@ -229,7 +227,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                                                       NULL, 
                                                                       c("Study Design",
                                                                         "Log2CPM Gene Counts",
-                                                                        "vDGEList"),
+                                                                        "DGEList"),
                                                                       options = list(style = 'btn btn-default')),
                                                           uiOutput("StudyInfo.panel.LS")
                                                     )
@@ -362,7 +360,7 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                        tags$ol(
                                            tags$li('Study design file (.csv)'),
                                            tags$li('Filtered, normalized log2CPM gene counts (.csv)'),
-                                           tags$li('Variance-stabilized Digital Gene Expression List (vDGEList; R object)')
+                                           tags$li('Digital Gene Expression List (DGEList; R object)')
                                        )),
                                      
                                      pickerInput("which.Experimental.Info.About",
@@ -370,22 +368,19 @@ navbarPage(title = h3(em("Caenorhabditis"), "RNA-seq Browser"),
                                                  choices = list(
                                                      `C. elegans` = c("C. elegans Study Design",
                                                                     "C. elegans Log2CPM Gene Counts",
-                                                                    "C. elegans vDGEList"),
+                                                                    "C. elegans DGEList"),
                                                      `C. briggsae` = c("C. briggsae Study Design",
                                                                          "C. briggsae Log2CPM Gene Counts",
-                                                                         "C. briggsae vDGEList"),
+                                                                         "C. briggsae DGEList"),
                                                      `C. brenneri` = c("C. brenneri Study Design",
                                                                             "C. brenneri Log2CPM Gene Counts",
-                                                                            "C. brenneri vDGEList"),
+                                                                            "C. brenneri DGEList"),
                                                      `C. japonica` = c("C. japonica Study Design",
                                                                       "C. japonica Log2CPM Gene Counts",
-                                                                      "C. japonica vDGEList"),
+                                                                      "C. japonica DGEList"),
                                                      `C. remanei` = c("C. remanei Study Design",
                                                                       "C. remanei Log2CPM Gene Counts",
-                                                                      "C. remanei vDGEList"),
-                                                     `C. elebans Embryonic` = c("C. elegans Embryonic Study Design",
-                                                                      "C. elegans Embryonic Log2CPM Gene Counts",
-                                                                      "C. elegans Embryonic vDGEList")
+                                                                      "C. remanei DGEList")
                                                  ),
                                                  options = list(style = 'btn btn-primary',
                                                                 title = "Select a file to download")),

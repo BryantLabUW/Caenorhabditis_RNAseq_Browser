@@ -2,7 +2,7 @@
 pull_DEGs_GW <- reactive({
     req(vals$comparison_GW)
     req(vals$list.myTopHits.df_GW)
-    req(vals$v.DGEList.filtered.norm)
+    req(vals$DGEList.filtered.norm)
     setProgress(0.5)
     if (isTruthy(input$displayedComparison_GW)){
         vals$displayedComparison_GW <- match(input$displayedComparison_GW,
@@ -51,7 +51,7 @@ pull_DEGs_GW <- reactive({
                             gsub('-',
                                  ' vs ',
                                  vals$comparison_GW[vals$displayedComparison_GW])),
-             subtitle = paste0("black line: p = ",
+             subtitle = paste0("black dashed line: p = ",
                                adj.P.thresh, "; colored lines: log-fold change = +/-",  lfc.thresh),
              color = "GeneIDs",
              y = "BH-adjusted p-value",
@@ -210,8 +210,8 @@ assemble_DEGs_GW <- reactive({
                                        by = "geneID") %>%
         left_join(vals$annotations, by = "geneID") # Add gene annotations
     
-    sample.num.tS <- sapply(tS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
-    sample.num.cS <- sapply(cS, function(x) {colSums(vals$v.DGEList.filtered.norm$design)[[x]]}) %>% sum()
+    sample.num.tS <- sapply(tS, function(x) {colSums(vals$DGEList.filtered.norm$design)[[x]]}) %>% sum()
+    sample.num.cS <- sapply(cS, function(x) {colSums(vals$DGEList.filtered.norm$design)[[x]]}) %>% sum()
     n_num_cols <- sample.num.tS + sample.num.cS + 6
     index_homologs <- length(colnames(vals$list.highlight.tbl_GW[[vals$displayedComparison_GW]])) - 6
     
