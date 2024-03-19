@@ -15,8 +15,6 @@ output:
 # Introduction
 The goal of this file is to arrange gene-centric *Caenorhbaditis* RNA-seq data originally published as part of the modENCODE project or by the Waterston Lab at the University of Washington ([Gerstein *et al* 2010](https://pubmed.ncbi.nlm.nih.gov/21177976/), [Gerstein *et al* 2014](https://www.nature.com/articles/nature13424), [Boeck *et al*., 2016](https://pubmed.ncbi.nlm.nih.gov/27531719/), and [Warner *et al* 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  
 
-## Update Notes  
-
 # Pre-processing Methods Overview  
 Each genome and gff file were downloaded from WormBase.org version WS290. Reads were aligned to each genome using STAR (v2.7.6a, --alignIntronMax 30000 --alignMatesGapMax 30000) and the species-specific WS290 GTF file for each genome. PCR duplicates were removed using "seldup" ([Warner *et al*., 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6581053/)).  Read counts were obtained for each gene (CDS region only which is labeled as "CDS"  in *C. briggsae* and *C. elegans* and as "coding_exon" for *C. remanei*, *C. japonica*, and *C. brenneri*) using featureCounts (from the software package subread-2.0.6) using default settings. Only uniquely mapping reads were counted.  Additionally read counts were obtained for the CDS regions and for the full transcripts using the featureCount options -M --fraction so that multimappers were counted by splitting them equally among all of the locations where they aligned. Alignment and counting was performed by LaDeana Hillier (Waterston Lab, UW). 
 
@@ -30,7 +28,7 @@ For *C. remanei*, *C. japonica*, and *C. brenneri*, the lack of consistent biolo
 
 For *C. elegans* embryonic timeline data, samples are from four previously published time series. Biological replicates are defined by a previously established inferred timeline that unified samples between these embryo time series ([Boeck *et al*., 2016](https://pubmed.ncbi.nlm.nih.gov/27531719/)). Group names represent the average time for biological replicate pairs, which were selected to represent 80 minute developmental intervals. This timing was chosen to match previously published differential expression analyses.
 
-This document saves multiple files that are passed to a Shiny Web App for downstream browsing and on-demand analysis. Note that these files are saved in an Outputs folder; in order to make them accessible to a local version of the Shiny browser they need to be moved to appropriate subfolders within the App folder - the www sub folder (for .csv files) or the Data subfolder (for R objects). Stable copies are already located within those folders and do not need to be replaced unless the pre-processing steps change.   
+This document saves multiple files that are passed to a Shiny Web App for downstream browsing and on-demand analysis. A copy of the *Caenorhbaditis* RNA-seq Browser is deployed online via shinyapps.io, and can be accessed at [https://bit.ly/CaenSeq](https://bit.ly/CaenSeqCode).
 
 ```{r , echo = FALSE,}
 knitr::opts_chunk$set(
