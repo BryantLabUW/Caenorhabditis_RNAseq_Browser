@@ -26,11 +26,13 @@ suppressPackageStartupMessages({
     library(dendextend)
     library(vctrs)
     library(markdown)
-    source("Server/ggheatmap_local.R")
+    source("Utils/ggheatmap_local.R")
+    source("Utils/wormpal.R")
+    source("Utils/theme_Publication.R")
     source("Server/calc_DEG_tbl.R")
-    source("Server/theme_Publication.R")
     source('Server/limma_ranking.R')
     source("Server/generate_excel_report.R")
+
 })
 
 # ---- Background ----

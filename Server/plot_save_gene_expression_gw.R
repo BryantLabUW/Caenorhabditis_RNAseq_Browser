@@ -186,6 +186,8 @@ generateGenePlot <- reactive({
                                        stroke = .75,
                                        show.legend = F,
                                        aes(color = life_stage)) +
+                           scale_fill_manual(values = worm.pal()) +
+                           scale_color_manual(values = worm.pal()) +
                            labs(y="log2 CPM expression", x = "Life Stage",
                                 title= "Log2 Counts per Million (CPM) Expression",
                                 subtitle=paste("Selected gene:",
@@ -348,6 +350,8 @@ output$CPM.homologs <- renderPlot({
                            facet_grid(~id + geneID, 
                                       scales = "free_x",
                                       space = "free_x") +
+                           scale_fill_manual(values = worm.pal()) +
+                           scale_color_manual(values = worm.pal()) +
                            theme_Publication() + 
                            theme(axis.text.x = element_text(
                                    angle = 45,

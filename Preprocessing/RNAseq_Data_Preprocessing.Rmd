@@ -52,6 +52,8 @@ if (!dir.exists(output.path)){
 
 app.path <-"../Data"
 www.path <-"../www"
+
+source("../Utils/wormpal.R")
 ```
 
 # Code 
@@ -160,6 +162,7 @@ p1 <- ggplot(log2.cpm.df.pivot) +
        fill= "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
+  scale_fill_manual(values = worm.pal()) +
   theme(text = element_text(size = 10),
         title = element_text(size = 10),
         axis.text.y = element_text (size = 5)) +
@@ -208,6 +211,7 @@ p2 <- ggplot(log2.cpm.filtered.df.pivot) +
        fill = "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
+  scale_fill_manual(values = worm.pal()) +
   theme(text = element_text(size = 10),
         title = element_text(size = 10),
         axis.text.y = element_text (size = 5)) +
@@ -260,6 +264,7 @@ p.discarded <- ggplot(log2.cpm.discarded.df.pivot) +
        fill = "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
+  scale_fill_manual(values = worm.pal()) +
   theme(text = element_text(size = 10),
         title = element_text(size = 10),
         axis.text.y = element_text (size = 5)) +
@@ -298,6 +303,7 @@ p3 <- ggplot(log2.cpm.filtered.norm.df.pivot) +
        fill = "Life stage",
        caption=paste0("produced on ", Sys.time())) +
   theme_bw() +
+  scale_fill_manual(values = worm.pal()) +
   theme(text = element_text(size = 10),
         title = element_text(size = 10),
         axis.text.y = element_text (size = 5)) +
@@ -436,6 +442,7 @@ p4<-dend %>%
        subtitle = "filtered, TMM normalized",
        y = "Distance",
        x = "Life stage") +
+  scale_fill_manual(values = worm.pal()) +
   coord_fixed(1/2) +
   theme(axis.title.x = element_text(color = "black"),
         axis.title.y = element_text(angle = 90),
@@ -454,8 +461,6 @@ summary(pca.res) # Prints variance summary for all principal components.
 #note that these have a magnitude and a direction (this is the basis for making a PCA plot)
 ## This generates a screeplot: a standard way to view eigenvalues for each PCA. Shows the proportion of variance accounted for by each PC. Plotting only the first 10 dimensions.
 p5<-fviz_eig(pca.res,
-             #barcolor = brewer.pal(8,"Pastel2")[8],
-             #barfill = brewer.pal(8,"Pastel2")[8],
              linecolor = "black",
              main = "Scree plot: proportion of variance accounted for by each principal component", ggtheme = theme_bw()) 
 
@@ -482,6 +487,7 @@ p6<-ggplot(pca.res.df) +
        sub = "Note: analysis is blind to sample identity.",
        fill = "Life stage",
        color = "Life stage") +
+  scale_fill_manual(values = worm.pal()) +
   scale_x_continuous(expand = c(.3, .3)) +
   scale_y_continuous(expand = c(.3, .3)) +
   coord_fixed() +
@@ -491,8 +497,8 @@ p6<-ggplot(pca.res.df) +
 
 # Create a PCA 'small multiples' chart ----
 if (ncol(pca.res$x)>5){
-  pca.res.df <- pca.res$x[,1:6]}
-else {
+  pca.res.df <- pca.res$x[,1:6]
+  } else {
   pca.res.df <- pca.res$x[,1:ncol(pca.res$x)]
 }
  
@@ -520,6 +526,7 @@ names(PC.labs) <- c("PC1", "PC2", "PC3")
 p7<-ggplot(pca.pivot) +
   aes(x=sample, y=loadings) + # you could iteratively 'paint' different co-variates onto this plot using the 'fill' aes
   geom_bar(stat="identity") +
+  scale_fill_manual(values = worm.pal()) +
   facet_wrap(~PC, labeller = labeller(PC = PC.labs)) +
   geom_bar(data = PC1, stat = "identity", aes(fill = group)) +
   geom_bar(data = PC2, stat = "identity", aes(fill = group)) +

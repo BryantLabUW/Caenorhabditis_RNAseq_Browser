@@ -46,7 +46,7 @@ pull_DEGs_GW <- reactive({
                    linewidth=1) + {
                        if (vals$scaletogenome == TRUE) expand_limits(x = c(min(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$logFC), max(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$logFC)), y = c(min(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$BH.adj.P.Val), max(vals$list.myTopHits.df_GW[[vals$displayedComparison_GW]]$BH.adj.P.Val))) } +
         guides(size = "none",
-               colour = point_labels)+
+               colour = point_labels) +
         labs(title = paste0('Pairwise Comparison: ',
                             gsub('-',
                                  ' vs ',
