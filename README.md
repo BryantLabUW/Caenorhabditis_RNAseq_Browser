@@ -4,13 +4,13 @@ Web-based Shiny App for browsing and on-demand analysis of *Caenorhabditis* RNA-
 This app is based on the *Strongyloides* RNA-seq Browser. For more information, [please see the G3 paper associated with the original project](https://pubmed.ncbi.nlm.nih.gov/33823530/).
 
 ## Table of Contents  
-1. [General Information](#general-information)
-2. [App Setup & Deployment](#app-setup-&-deployment)
-3. [App Features](#app-features)
-4. [Repository Structure](#repository-structure)
-5. [Sources](#sources)
-6. [License](#license)
-7. [Authors](#authors)
+1. General Information
+2. App Setup & Deployment
+3. App Features
+4. Repository Structure
+5. Sources
+6. License
+7. Authors
 
 ## 1. General Information
 This repository contains source code for the web-based *Caenorhabditis* RNA-seq Browser. This app is deployed via Shinyapps.io but can also be run locally. See App Setup and App Features sections below for additional details.  
